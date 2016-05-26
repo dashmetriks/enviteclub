@@ -14,6 +14,10 @@ angular.module('envite.invite', [
             templateUrl: 'invites/invited_list.html',
             controller: 'invitesController'
         })
+        .when('/invited_list2/:event_id', {
+            templateUrl: 'invites/invited_list2.html',
+            controller: 'invitesController'
+        })
         .when('/event_list', {
             templateUrl: 'invites/event_list.html',
             controller: 'invitesController'
@@ -564,7 +568,7 @@ angular.module('envite.invite', [
             $http({
                     method: 'POST',
                     url: express_endpoint + '/api/sendsms/' + $routeParams.event_id,
-                    data: 'text=' + $scope.formData.text + '&phone=' + $scope.formData.email,
+                    data: 'text=' + $scope.formData.text + '&phone=' + $scope.formData.email + '&message=' + $scope.formData.message,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'x-access-token': $window.localStorage.getItem('token')

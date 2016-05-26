@@ -10,6 +10,7 @@ var user = require('./routes/user');
 var events = require('./routes/events');
 var invites = require('./routes/invites');
 var invitepage = require('./routes/invitepage');
+var sms = require('./routes/sms');
 
 
 var cors = require('cors')
@@ -133,6 +134,8 @@ apiRoutes.get('/geteventinvite/:invite_code', invitepage.geteventinvite);
 apiRoutes.get('/invited/:event_id', invites.invitedlist);
 
 apiRoutes.post('/addinvite/:event_id/', invites.addinvite); 
+apiRoutes.post('/sendsms/:event_id/', sms.sendsms);
+app.get('/smsdata', sms.smsdata);
 
 
 app.use('/api', apiRoutes);

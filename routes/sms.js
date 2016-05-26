@@ -1,4 +1,15 @@
-apiRoutes.post('/sendsms/:event_id/', function(req, res) {
+var Invite = require('../app/models/invites');
+var Event = require('../app/models/events');
+var crypto = require('crypto');
+var config = require('../config');
+var client = require('twilio')(config.twilio_sid, config.twilio_token);
+
+function randomValueHex(len) {
+    return crypto.randomBytes(Math.ceil(len / 2))
+        .toString('hex') // convert to hexadecimal format
+        .slice(0, len); // return required number of characters
+}
+exports.sendsms = function(req, res){
 
     Event.find({
             _id: req.params.event_id
@@ -24,10 +35,11 @@ apiRoutes.post('/sendsms/:event_id/', function(req, res) {
                         to: '+1' + req.body.phone, // Any number Twilio can deliver to
                         from: '+14152149049', // A number you bought from Twilio and can use for outbound communication
                         //body: req.body.sms_type // body of the SMS message
-                        body: "fdsafsafdsfdsafdsafdas"
+                        body: req.body.message
 
                     }, function(err, responseData) { //this function is executed when a response is received from Twilio
-
+                   
+                    console.log(err)
                         if (!err) { // "err" is an error received during the request, if any
 
                         }
@@ -51,9 +63,10 @@ apiRoutes.post('/sendsms/:event_id/', function(req, res) {
                         });
                 }); //d8d88d
         });
-});
+}
 
-app.get('/smsdata', function(req, res) {
+exports.smsdata = function(req, res){
+
     Invite.create({
             event_id: '573df302ff23ec9151000002',
             invited_email: req.query.From,
@@ -64,4 +77,4 @@ app.get('/smsdata', function(req, res) {
                 throw err;
         });
     io.sockets.emit("mms", '573df302ff23ec9151000002');
-});
+}
