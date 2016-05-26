@@ -1,0 +1,49 @@
+/* Put your css in here */
+.form-horizontal {
+   width:500px;
+}
+
+.datetime-picker-dropdown {
+  
+}
+
+.datetime-picker-dropdown > li.date-picker-menu div > table .btn-default {
+  border: 0;
+}
+
+.datetime-picker-dropdown > li.time-picker-menu div > table {
+  
+}
+
+#site_header {
+    background-color: #313131;
+    color: #888;
+    active: hotpink;
+    display: inline-block;
+    zoom: 1;
+    width: 100%;
+    vertical-align: top;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    position: fixed;
+    line-height: 4px;
+    font-family: 'Open Sans',Arial,sans-serif;
+}
+#nav_toggle {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.navbar {
+  margin-bottom: 20px;
+}
