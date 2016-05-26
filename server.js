@@ -4,7 +4,7 @@
 var express = require('express');
 var app = express(); // create our app w/ express
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+io = require('socket.io')(server);
 var path = require('path');
 var user = require('./routes/user');
 var events = require('./routes/events');
@@ -52,16 +52,6 @@ var apiRoutes = express.Router();
 
 // configuration =================
 app.set('superSecret', config.secret);
-
-io.on('connection', function(client) {
-
-    client.on('join', function(data) {
-        console.log(data);
-        client.emit('messages', 'Hello from server');
-    });
-
-});
-
 
 mongoose.connect('mongodb://localhost:27017/test'); // connect to mongoDB database on modulus.io
 

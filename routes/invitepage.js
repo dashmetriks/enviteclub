@@ -9,7 +9,7 @@ var Comments = require('../app/models/comments');
 var crypto = require('crypto');
 var app = express(); // create our app w/ express
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+//var io = require('socket.io')(server);
 var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -23,7 +23,11 @@ function randomValueHex(len) {
         .toString('hex') // convert to hexadecimal format
         .slice(0, len); // return required number of characters
 }
-
+io.on('connection', function(client) {
+    client.on('join', function(data) {
+        client.emit('messages', 'Hello from server');
+    });
+});
 exports.getinvite = function(req, res){
 //app.get('/invites/:invite_code', function(req, res) {
     Invite.findOne({
@@ -91,12 +95,12 @@ exports.adduserevent2 = function(req, res){
                                 if (err)
                                     throw err;
                             });
-                        get_ev(req.params.event_id, "10000", function(data) {
+                        get_event_data(req.params.event_id, "10000", function(data) {
                             send_email_alert_comment(req.params.event_id, req.params.invite_code, req.params.ustatus, req.body.comment, req.body.displayname, data)
                             res.json(data);
                         })
                     } else {
-                        get_ev(req.params.event_id, "10000", function(data) {
+                        get_event_data(req.params.event_id, "10000", function(data) {
                             send_email_alert_rsvp(req.params.event_id, req.params.invite_code, req.params.ustatus, "", req.body.displayname, data)
                             res.json(data);
                         })
@@ -144,6 +148,7 @@ exports.adduserevent2 = function(req, res){
                 })
             }
             io.sockets.emit("getinvite", req.params.invite_code);
+            console.log("asdf soooooooket")
         } // else   players = null
     });
 }

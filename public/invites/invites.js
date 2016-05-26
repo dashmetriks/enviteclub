@@ -118,17 +118,16 @@ angular.module('envite.invite', [
         };
 
 
-
         var socket = io.connect(express_endpoint);
         socket.on('connect', function(data) {
-        //    socket.emit('join', 'Hello World from client');
-            //$scope.logOut();
+            socket.emit('join', 'Hello World from client 999');
         });
         socket.on('messages', function(data) {
-
+          //   console.log("we have liftoff")
         });
 
         socket.on("getinvite", function(message) {
+            console.log("asdfkasdfkaskdfkdsf")
             $scope.getEventInvite(message);
         });
 
