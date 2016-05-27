@@ -15,7 +15,7 @@ var sms = require('./routes/sms');
 
 var cors = require('cors')
 var mongoose = require('mongoose'); // mongoose for mongodb
-var autoIncrement = require('mongoose-auto-increment');
+//var autoIncrement = require('mongoose-auto-increment');
 var async = require("async");
 
 var morgan = require('morgan'); // log requests to the console (express4)

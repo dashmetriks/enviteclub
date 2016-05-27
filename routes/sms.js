@@ -68,13 +68,13 @@ exports.sendsms = function(req, res){
 exports.smsdata = function(req, res){
 
     Invite.create({
-            event_id: '573df302ff23ec9151000002',
-            invited_email: req.query.From,
-            invite_status: req.query.MediaUrl0
+            event_id: '57479fd2cd87fa283a000001',
+            invited_phone: req.query.From,
+            twilio_media: req.query.MediaUrl0
         },
         function(err, result) {
             if (err)
                 throw err;
         });
-    io.sockets.emit("mms", '573df302ff23ec9151000002');
+    io.sockets.emit("mms", '57479fd2cd87fa283a000001');
 }
