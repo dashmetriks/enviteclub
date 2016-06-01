@@ -90,7 +90,7 @@
         Required!</span>
     </div>
 
-                            <br/>
+                          <br/>
                         <label>Phone/Username</label>
                                 <input type="text" name="username" class="form-control input-sm text-center" placeholder="john@email.com" ng-model="formData.email" required>
         <div role="alert">
@@ -99,7 +99,7 @@
     </div>
                          <!--   <button type="submit"  ng-disabled="(myForm.displayname.$pristine && myForm.displayname.$invalid) && (myForm.username.$pristine && myForm.username.$invalid)" class="btn btn-primary btn-sm" ng-click="addInvite()">Invite</button> -->
 
-                            <button type="submit"  ng-disabled="myForm.displayname.$invalid ||  myForm.username.$invalid" class="btn btn-primary btn-sm" ng-click="sendSMS()">Invite</button>
+                            <button type="submit"  ng-disabled="myForm.displayname.$invalid ||  myForm.username.$invalid" class="btn btn-primary btn-sm" ng-click="sendSMS()">Send text</button>
                             </div>
                         </form>
                     </div>
@@ -111,16 +111,16 @@
                 <thead>
                     <tr>
                         <td><h4>Invited Name</h4> </td>
-                        <td><h4>Username/Email</h4> </td>
-                        <td><h4>Accepted Displayname</h4> </td>
+                        <td><h4>Phone</h4> </td>
                         <td><h4>Invited Status</h4> </td>
+                        <td><h4>Twilio Media</h4> </td>
                     </tr>
                 </thead>
                 <tr ng-repeat="x in invites">
                     <td>{{ x.invited}}</td>
-                    <td>{{ x.invited_email}}</td>
-                    <td>{{ x.accepted_displayname}}</td>
+                    <td>{{ x.invited_phone}}</td>
                     <td>{{ x.invite_status}}</td>
+                    <td><a href="{{ x.twilio_media}}"> <img src="{{ x.twilio_media}}" width=120 height=120></a></td>
                     <!--
                         <td><input type="button" value="Text Reminder" ng-click="resendInviteText(invite._id)"></td>
                         <td><input type="button" value="Email Reminder" ng-click="resendInviteEmail(invite._id)"></td>
