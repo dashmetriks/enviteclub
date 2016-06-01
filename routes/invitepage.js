@@ -313,6 +313,7 @@ function get_event_data(event_id, user_id, callback) {
                                                                     'logged_in_userid': user_id,
                                                                     'event': events,
                                                                     'players_list': players_list,
+                                                                    'date_now': Date.now(),
                                                                     'is_member': is_member,
                                                                     'players_yes': players_yes,
                                                                     'players_no': players_no,

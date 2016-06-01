@@ -34,7 +34,8 @@ angular.module('envite.invite', [
     $scope: {
       timer : '='
     },
-    template: '<h4 ng-if="counter <= 59">{{counter | number:0 }}s</h4><h4 ng-if="(counter >= 60) && (counter <= 3600)">{{(counter / 60) | number:0 }} <span>{{((counter / 60)| number:0) >= 2 ? "minutes" : "minute"}} ago</span> <h4 ng-if="(counter >= 3600) && (counter <= 86400)">{{(counter / 3600) | number:0 }} <span>{{((counter / 3600) | number:0) >= 2 ? "hours" : "hour"}} ago</span></h4> <h4 ng-if="(counter >= 86400)">{{(counter / 86400) | number:0 }} <span>{{((counter / 86400)) <= 1.9 ? "day" : "days"}}</span> ago</h4> ',
+  //  template: '<h4 ng-if="counter <= 59">{{counter | number:0 }}s</h4><h4 ng-if="(counter >= 60) && (counter <= 3600)">{{(counter / 60) | number:0 }} <span>{{((counter / 60)| number:0) >= 2 ? "minutes" : "minute"}} ago</span> <h4 ng-if="(counter >= 3600) && (counter <= 86400)">{{(counter / 3600) | number:0 }} <span>{{((counter / 3600) | number:0) >= 2 ? "hours" : "hour"}} ago</span></h4> <h4 ng-if="(counter >= 86400)">{{(counter / 86400) | number:0 }} <span>{{((counter / 86400)) <= 1.9 ? "day" : "days"}}</span> ago</h4> ',
+    template: '<span ng-if="counter <= 59">{{counter | number:0 }} seconds ago</span> <span ng-if="(counter >= 60) && (counter <= 3600)">{{(counter / 60) | number:0 }} {{((counter / 60)| number:0) >= 2 ? "minutes" : "minute"}} ago</span> <span ng-if="(counter >= 3600) && (counter <= 86400)">{{(counter / 3600) | number:0 }} {{((counter / 3600) | number:0) >= 2 ? "hours" : "hour"}} ago</span> <span ng-if="(counter >= 86400)">{{(counter / 86400) | number:0 }} {{((counter / 86400)) <= 1.9 ? "day" : "days"}} ago</span> ',
     controller: function($scope, $timeout) {
       $scope.counter = $scope.timer.strtime;
       var callback = function() {
@@ -350,6 +351,7 @@ angular.module('envite.invite', [
                     }
                 }).success(function(data) {
 
+                    $scope.timers = []; 
                     $scope.invite_code = data['invite_creator']['invite_code']
                     $scope.event_id = $routeParams.event_id;
                     $scope.invites = data['invites'];
@@ -401,6 +403,7 @@ angular.module('envite.invite', [
                     url: endpoint,
                     headers: head
                 }).success(function(data) {
+                    $scope.timers = [];
                     $scope.event_title = data['event'][0].event_title;
                     $scope.event_date = data['event'][0].event_start;
                     $scope.event_creator_displayname = data['event'][0].event_creator_displayname;
@@ -409,6 +412,7 @@ angular.module('envite.invite', [
                     $scope.event_id = data['event'][0]._id;
                     $scope.yeses = data['players_yes'];
                     $scope.nos = data['players_no'];
+                    $scope.date_now = data['date_now'];
                     $scope.players_list = data['players_list'];
                     $scope.comments = data['comments'];
                     $scope.loggedInUsername = data['logged_in_username'];
@@ -457,6 +461,7 @@ angular.module('envite.invite', [
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
+                    $scope.timers = []; 
                     $scope.event_title = data['event'][0].event_title;
                     $scope.event_date = data['event'][0].event_start;
                     $scope.event_creator_displayname = data['event'][0].event_creator_displayname;
@@ -464,6 +469,7 @@ angular.module('envite.invite', [
                     $scope.event_id = data['event'][0]._id;
                     $scope.yeses = data['players_yes'];
                     $scope.nos = data['players_no'];
+                    $scope.date_now = data['date_now'];
                     $scope.comments = data['comments'];
                     $scope.loggedInUsername = data['logged_in_username'];
                     if (data['is_member'].length > 0) {
@@ -582,6 +588,7 @@ angular.module('envite.invite', [
         };
 
         $scope.addComment = function() {
+                    console.log('asdfdsfsa');
             $http({
                     method: 'POST',
                     url: express_endpoint + '/api/addcomment/' + $routeParams.event_id,
@@ -591,7 +598,8 @@ angular.module('envite.invite', [
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
-                    $scope.getEvent();
+                  //  $scope.date_now = data['date_now'];
+                 //   $scope.getEvent();
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
@@ -600,14 +608,12 @@ angular.module('envite.invite', [
 
 $scope.timers = [];
   $scope.counter2 = 1500;
-  $scope.setthetime = function(wtf, created_at) {
+  $scope.setthetime = function(ob_id, created_at) {
     var myDate = +new Date(created_at)
-    console.log($scope.date_now) 
-    console.log(myDate)
-    console.log(($scope.date_now - myDate)/ 1000)
+//    console.log(myDate)
+ //   console.log(($scope.date_now - myDate)/ 1000)
     var start_cnt = Math.round(($scope.date_now - myDate)/ 1000)
-    $scope.timers.push({invite_code: wtf, strtime: start_cnt}) ;
-   // $scope.counter2 = $scope.counter2  + 1500;
+    $scope.timers.push({invite_code: ob_id, strtime: start_cnt}) ;
   };
 
         $scope.sendSMS = function() {
@@ -621,7 +627,7 @@ $scope.timers = [];
                     }
                 }).success(function(data) {
                     $scope.invite_code1 = data["invites"][0]["invite_code"]
-                    $scope.timers = []; 
+                  //  $scope.timers = []; 
                  //   $scope.timers.push({strtime: 1000, name : data["invites"][0]["invite_code"], date1: data["invites"][0]["created_at"]});
                     $scope.counter2++;
                   //  $scope.strtime = 1500;

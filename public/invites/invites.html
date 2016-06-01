@@ -175,6 +175,7 @@
                 <h3>Comments </h3>
                 <div class="well well-sm" ng-repeat="comment in comments">
                     "{{comment.text}}" by <b>  {{comment.displayname}} </b>
+                    <span ng-init="setthetime(comment._id, comment.created_at)"><timer ng-repeat="timer in timers | filter:{ invite_code: comment._id }  track by $index"> </timer></span>
                 </div>
             </div>
         </div>
