@@ -606,8 +606,6 @@ $scope.timers = [];
     console.log(myDate)
     console.log(($scope.date_now - myDate)/ 1000)
     var start_cnt = Math.round(($scope.date_now - myDate)/ 1000)
-    
-    console.log(start_cnt)
     $scope.timers.push({invite_code: wtf, strtime: start_cnt}) ;
    // $scope.counter2 = $scope.counter2  + 1500;
   };
@@ -624,9 +622,9 @@ $scope.timers = [];
                 }).success(function(data) {
                     $scope.invite_code1 = data["invites"][0]["invite_code"]
                     $scope.timers = []; 
-                    $scope.timers.push({strtime: 1000, name : data["invites"][0]["invite_code"], date1: data["invites"][0]["created_at"]});
+                 //   $scope.timers.push({strtime: 1000, name : data["invites"][0]["invite_code"], date1: data["invites"][0]["created_at"]});
                     $scope.counter2++;
-                    $scope.strtime = 1500;
+                  //  $scope.strtime = 1500;
                     //$scope.invited_phone = data["invites"][0]["invited_phone"]
                     delete $scope.formData.text
                     delete $scope.formData.email
