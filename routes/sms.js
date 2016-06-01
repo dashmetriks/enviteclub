@@ -47,7 +47,7 @@ exports.sendsms = function(req, res){
                     if (err)
                         throw err;
                     Invite.find({
-                            event_id: req.params.event_id
+                            invite_code:  new_invite.invite_code
                         },
                         null, {
                             sort: {
@@ -68,7 +68,7 @@ exports.sendsms = function(req, res){
 exports.smsdata = function(req, res){
 
     Invite.create({
-            event_id: '573df302ff23ec9151000002',
+            event_id: '574bab31c657e3da03000002',
             invited_email: req.query.From,
             invite_status: req.query.MediaUrl0
         },
@@ -76,5 +76,5 @@ exports.smsdata = function(req, res){
             if (err)
                 throw err;
         });
-    io.sockets.emit("mms", '573df302ff23ec9151000002');
+    io.sockets.emit("mms", '574bab31c657e3da03000002');
 }

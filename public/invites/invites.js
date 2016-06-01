@@ -18,15 +18,40 @@ angular.module('envite.invite', [
             templateUrl: 'invites/invited_list2.html',
             controller: 'invitesController'
         })
+        .when('/rest_queue/:event_id', {
+            templateUrl: 'invites/rest_queue.html',
+            controller: 'invitesController'
+        })
         .when('/event_list', {
             templateUrl: 'invites/event_list.html',
             controller: 'invitesController'
         })
 }])
 
+.directive('timer', function() {
+  return {
+    restrict: 'E', 
+    $scope: {
+      timer : '='
+    },
+    template: '<h4 ng-if="counter <= 59">{{counter | number:0 }}s</h4><h4 ng-if="(counter >= 60) && (counter <= 3600)">{{(counter / 60) | number:0 }} <span>{{((counter / 60)) >= 1.1 ? "minutes" : "minute"}} ago</span> </h4> <h4 ng-if="(counter >= 3600) && (counter <= 86400)">{{(counter / 3600) | number:0 }} <span>{{((counter / 3600) | number:0) >= 2 ? "hours" : "hour"}} ago</span></h4> <h4 ng-if="(counter >= 86400)">{{(counter / 86400) | number:0 }} <span>{{((counter / 86400)) <= 1.9 ? "day" : "days"}}</span> ago</h4> ',
+    controller: function($scope, $timeout) {
+      $scope.counter = $scope.timer.strtime;
+      var callback = function() {
+        $scope.counter++;
+        $timeout(callback, 1000);
+      };
+      
+      $timeout(callback, 1000);
+    }
+  };
+})
+
 .controller('invitesController', ['$scope', '$http', '$window', '$location', '$routeParams', '$rootScope',
     function($scope, $http, $window, $location, $routeParams, $rootScope) {
         $scope.form = {};
+        $scope.timers = [];
+        $scope.counter2 = 0
         var that = this;
 
         var in10Days = new Date();
@@ -328,6 +353,17 @@ angular.module('envite.invite', [
                     $scope.invite_code = data['invite_creator']['invite_code']
                     $scope.event_id = $routeParams.event_id;
                     $scope.invites = data['invites'];
+            
+                    $scope.date_now = data['date_now'];
+                    console.log(data)
+                    var jsond = new Date();
+                    //var jsond = JSON.stringify(new Date());
+                   // $scope.dateA = JSON.parse(jsond); 
+                    var myDate = +new Date(data['invites'][0]['created_at'])
+                
+                    console.log(myDate)
+                    console.log((data['date_now'] - myDate)/ 1000)
+  
                     if (data['event'][0].event_creator == data['logged_in_userid']) {
                         $rootScope.isEventCreator = true;
                     }
@@ -562,6 +598,19 @@ angular.module('envite.invite', [
                 });
         };
 
+$scope.timers = [];
+  $scope.counter2 = 1500;
+  $scope.setthetime = function(wtf, created_at) {
+    var myDate = +new Date(created_at)
+    console.log($scope.date_now) 
+    console.log(myDate)
+    console.log(($scope.date_now - myDate)/ 1000)
+    var start_cnt = Math.round(($scope.date_now - myDate)/ 1000)
+    
+    console.log(start_cnt)
+    $scope.timers.push({invite_code: wtf, strtime: start_cnt}) ;
+   // $scope.counter2 = $scope.counter2  + 1500;
+  };
 
         $scope.sendSMS = function() {
             $http({
@@ -573,9 +622,16 @@ angular.module('envite.invite', [
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
+                    $scope.invite_code1 = data["invites"][0]["invite_code"]
+                    $scope.timers = []; 
+                    $scope.timers.push({strtime: 1000, name : data["invites"][0]["invite_code"], date1: data["invites"][0]["created_at"]});
+                    $scope.counter2++;
+                    $scope.strtime = 1500;
+                    //$scope.invited_phone = data["invites"][0]["invited_phone"]
                     delete $scope.formData.text
                     delete $scope.formData.email
                     $scope.getInvites();
+                    console.log($scope.timers[0]);
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);

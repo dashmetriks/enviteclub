@@ -62,6 +62,7 @@ exports.invitedlist = function(req, res){
                                 'logged_in_userid': req.decoded._doc._id,
                                 'invite_creator': invite_creator,
                                 'event': events,
+                                'date_now': Date.now(),
                                 'invites': invites
                             });
                         });
