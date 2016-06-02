@@ -13,7 +13,9 @@
                     <!-- password1 -->
                     <div class="form-group" ng-class="{ 'has-error' : userForm.password.$invalid &&  submitted }">
                         <label>Password</label>
-                        <input id="password" name="password" ng-model="fields.password" class="form-control" required type="password" />
+                        <input id="password" name="password" ng-minlength="6"  ng-model="fields.password" class="form-control" required type="password" />
+                        <span class="error" ng-show="userForm.password.$error.minlength">
+        Passwords need to 6 characters or more</span>
                         <p ng-show="(userForm.password.$invalid && submitted) || noPassword" class="help-block">Password is required.</p>
                     </div>
                     <!-- password2 -->
