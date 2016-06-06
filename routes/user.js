@@ -1,15 +1,30 @@
 var jwt = require('jsonwebtoken');
 var User = require('../app/models/user');
+var Passwordreset = require('../app/models/passreset');
 var express = require('express');
 var app = express(); // create our app w/ express
 var config = require('../config');
 var bcrypt = require('bcrypt');
- 
+
+var crypto = require('crypto');
 var salt = bcrypt.genSaltSync(10);
 
+function randomValueHex(len) {
+    return crypto.randomBytes(Math.ceil(len / 2))
+        .toString('hex') // convert to hexadecimal format
+        .slice(0, len); // return required number of characters
+}
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: config.username,
+        pass: config.password
+    }
+});
 app.set('superSecret', config.secret);
 
-exports.register = function(req, res){
+exports.register = function(req, res) {
     User.findOne({
         username: req.body.name
     }, function(err, user) {
@@ -42,7 +57,81 @@ exports.register = function(req, res){
     });
 }
 
-exports.authenticate = function(req, res){
+exports.password_reset = function(req, res) {
+
+    User.findOne({
+        username: req.body.username
+    }, function(err, user) {
+
+        if (err)
+            throw err;
+
+        if (!user) {
+            res.json({
+                success: false,
+              //  message: 'Authentication failed. User not found.'
+                message: 'Email not found. Please try again'
+            });
+        } else if (user) {
+            Passwordreset.create({
+                    reset_email: req.body.username,
+                    reset_code: randomValueHex(8),
+                    reset_status: "Sent"
+                },
+                function(err, password_reset) {
+                    transporter.sendMail({
+                        from: config.username,
+                        to: req.body.username,
+                        subject: 'You have requested a password reset',
+                        html: 'this is a one time reset code <a href="' + config.endpoint + '/reset_password/' + password_reset.reset_code + '">reset password</a>',
+                    });
+                    transporter.close();
+                    if (err)
+                        throw err;
+            res.json({
+                success: true,
+              //  message: 'Authentication failed. User not found.'
+                message: 'Reset request successfull.  Please check your email'
+            });
+                });
+        }
+
+    });
+}
+
+exports.reset_check = function(req, res) {
+    Passwordreset.findOne({
+            reset_code: req.params.reset_code,
+        },
+        function(err, reset_password) {
+            if (err) res.send(err)
+            if (reset_password) {
+              if (reset_password.reset_status == "Sent"){
+                res.json({
+                    success: true,
+                    message: 'please reset password.'
+                });
+              } else {
+                res.json({
+                    success: false,
+                    message: 'Reset code already used. Please request another'
+                });
+              }
+            } else {
+                res.json({
+                    success: false,
+                    message: 'Please request another password reset.'
+                });
+                /*
+                                return res.status(403).send({
+                                    success: false,
+                                    message: 'No Invite for that code.'
+                                });
+                */
+            }
+        });
+}
+exports.authenticate = function(req, res) {
 
     User.findOne({
         username: req.body.name
@@ -87,7 +176,7 @@ exports.authenticate = function(req, res){
     });
 }
 
-exports.usersave = function(req, res){
+exports.usersave = function(req, res) {
     User.update({
             _id: req.decoded._doc._id
         }, {
@@ -106,12 +195,91 @@ exports.usersave = function(req, res){
         });
 }
 
-exports.passwordsave = function(req, res){
+exports.resetpassword = function(req, res) {
+    Passwordreset.findOne({
+            reset_code: req.params.reset_code,
+        },
+        function(err, reset_password) {
+            if (err) res.send(err)
+            if (reset_password) {
+                console.log(reset_password.reset_email)
+                User.update({
+                        username: reset_password.reset_email
+                    }, {
+                        $set: {
+                            password: bcrypt.hashSync(req.body.password, salt)
+                        }
+                    },
+                    function(err, users) {
+                        if (err)
+                            throw err;
+                 
+                        res.json({
+                            success: true,
+                            message: 'password has been reset.  please login.'
+                        });
+                    });
+    Passwordreset.update({
+            reset_code: req.params.reset_code,
+                    }, {
+                        $set: {
+                            reset_status: "Used"
+                        }
+                    },
+                    function(err, pstatus) {
+                        if (err)
+                            throw err;
+                 
+                      //  res.json({
+                     //       success: true,
+                      //      message: 'password has been reset.  please login.'
+                     //   });
+                    });
+                //        res.json({
+                //           success: true,
+                //          message: 'please reset password.'
+                //      });
+            } else {
+                res.json({
+                    success: false,
+                    message: 'reset code already used.'
+                });
+                /*
+                                return res.status(403).send({
+                                    success: false,
+                                    message: 'No Invite for that code.'
+                                });
+                */
+            }
+        });
+    /*
+        User.update({
+                _id: req.decoded._doc._id
+            }, {
+                $set: {
+                    password: bcrypt.hashSync(req.body.password, salt) 
+                }
+            },
+            function(err, users) {
+                if (err)
+                    throw err;
+                //res.json(result);
+                res.json({
+                    success: true,
+                    message: 'password has been reset.  please login.'
+                });
+                //res.json({
+               //     'user': users,
+              //  });
+            });
+    */
+}
+exports.passwordsave = function(req, res) {
     User.update({
             _id: req.decoded._doc._id
         }, {
             $set: {
-                password: bcrypt.hashSync(req.body.password, salt) 
+                password: bcrypt.hashSync(req.body.password, salt)
             }
         },
         function(err, users) {
@@ -124,9 +292,9 @@ exports.passwordsave = function(req, res){
         });
 }
 
-exports.userget = function(req, res){
-console.log("asdfasfdasfads")
-console.log(req.decoded._doc._id)
+exports.userget = function(req, res) {
+    console.log("asdfasfdasfads")
+    console.log(req.decoded._doc._id)
     User.find({
             _id: req.decoded._doc._id
         },
@@ -138,4 +306,3 @@ console.log(req.decoded._doc._id)
             });
         });
 }
-

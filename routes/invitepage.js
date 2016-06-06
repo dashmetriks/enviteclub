@@ -28,6 +28,7 @@ io.on('connection', function(client) {
         client.emit('messages', 'Hello from server');
     });
 });
+
 exports.getinvite = function(req, res){
 //app.get('/invites/:invite_code', function(req, res) {
     Invite.findOne({

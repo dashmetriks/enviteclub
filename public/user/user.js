@@ -10,12 +10,19 @@ angular.module('envite.user', ['ngRoute'])
             templateUrl: 'user/register.html',
             controller: 'userController'
         })
+        .when('/password_reset', {
+            templateUrl: 'user/password_reset.html',
+            controller: 'userController'
+        })
+        .when('/reset_password/:reset_code', {
+            templateUrl: 'user/reset_password.html',
+            controller: 'userController'
+        })
         .when('/user', {
             templateUrl: 'user/user_account.html',
             controller: 'userController'
         })
 }])
-
 .controller('userController', ['$scope', '$http', '$window', '$location', '$routeParams', '$rootScope',
     function($scope, $http, $window, $location, $routeParams, $rootScope) {
         $scope.form = {};
@@ -47,6 +54,31 @@ angular.module('envite.user', ['ngRoute'])
             $scope.changePassword = $scope.changePassword === true ? false : true;
         }
 
+
+        $scope.reset_password = function() {
+            $scope.submitted = true;
+            if ($scope.fields.password.length < 1) {
+                $scope.noPassword = true;
+            } else {
+                $http({
+                    method: 'POST',
+                    url: express_endpoint + '/resetpassword/' + $routeParams.reset_code,
+                    data: '&password=' + $scope.fields.password,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                }).success(function(data) {
+                    $scope.changePassword = $scope.changePassword === true ? false : true;
+                    $rootScope.reg_message_success = "Password has been changed."
+                    if (data.success == true) {
+                        $rootScope.login_message = "Password has been reset.  Please login"
+                         $location.url('/login');
+                        //  $rootScope.reg_message_success = "Thanks for registering. Please confirm your Display Name"
+                        //   $scope.login();
+                    }
+                });
+            }
+        }
 
         $scope.save_password = function() {
             $scope.submitted = true;
@@ -89,10 +121,31 @@ angular.module('envite.user', ['ngRoute'])
                     }
                     if (data.success == true) {
                         $rootScope.reg_message_success = "Thanks for registering. Please confirm your Display Name"
+                        $rootScope.login_message = ""
                         $scope.login();
                     }
                 });
             }
+        }
+
+        $scope.checkReset = function() {
+            $http({
+                    method: 'GET',
+                    url: express_endpoint + '/resetcheck/' +  $routeParams.reset_code,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).success(function(data) {
+                   if (data.success == false){
+                        $rootScope.pwr_message = data.message 
+                        $location.url('/password_reset');
+                   }else{
+                        $scope.reset_message = data.message 
+                   }
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
         }
 
         $scope.checkLogin = function() {
@@ -121,6 +174,22 @@ angular.module('envite.user', ['ngRoute'])
                     console.log('Error: ' + data);
                 });
         }
+
+        $scope.password_reset = function() {
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/password_reset/',
+                    data: 'username=' + $scope.user.username, 
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).success(function(data) {
+                        $scope.pwr_message = data.message 
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
 
         $scope.userSave = function() {
             $http({

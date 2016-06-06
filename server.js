@@ -103,6 +103,9 @@ apiRoutes.use(function(req, res, next) {
 
 app.post('/register', user.register);
 app.post('/authenticate', user.authenticate);
+app.post('/password_reset', user.password_reset);
+app.post('/resetpassword/:reset_code', user.resetpassword);
+app.get('/resetcheck/:reset_code', user.reset_check);
 apiRoutes.get('/userget', user.userget);
 apiRoutes.post('/passwordsave', user.passwordsave);
 apiRoutes.post('/usersave', user.usersave);

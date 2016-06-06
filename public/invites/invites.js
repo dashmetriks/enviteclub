@@ -35,7 +35,7 @@ angular.module('envite.invite', [
       timer : '='
     },
   //  template: '<h4 ng-if="counter <= 59">{{counter | number:0 }}s</h4><h4 ng-if="(counter >= 60) && (counter <= 3600)">{{(counter / 60) | number:0 }} <span>{{((counter / 60)| number:0) >= 2 ? "minutes" : "minute"}} ago</span> <h4 ng-if="(counter >= 3600) && (counter <= 86400)">{{(counter / 3600) | number:0 }} <span>{{((counter / 3600) | number:0) >= 2 ? "hours" : "hour"}} ago</span></h4> <h4 ng-if="(counter >= 86400)">{{(counter / 86400) | number:0 }} <span>{{((counter / 86400)) <= 1.9 ? "day" : "days"}}</span> ago</h4> ',
-    template: '<span ng-if="counter <= 59">{{counter | number:0 }} seconds ago</span> <span ng-if="(counter >= 60) && (counter <= 3600)">{{(counter / 60) | number:0 }} {{((counter / 60)| number:0) >= 2 ? "minutes" : "minute"}} ago</span> <span ng-if="(counter >= 3600) && (counter <= 86400)">{{(counter / 3600) | number:0 }} {{((counter / 3600) | number:0) >= 2 ? "hours" : "hour"}} ago</span> <span ng-if="(counter >= 86400)">{{(counter / 86400) | number:0 }} {{((counter / 86400)) <= 1.9 ? "day" : "days"}} ago</span> {{counter}}',
+    template: '<span ng-if="counter <= 59">{{counter | number:0 }} seconds ago</span> <span ng-if="(counter >= 60) && (counter <= 3600)">{{(counter / 60) | number:0 }} {{((counter / 60)| number:0) >= 2 ? "minutes" : "minute"}} ago</span> <span ng-if="(counter >= 3600) && (counter <= 86400)">{{(counter / 3600) | number:0 }} {{((counter / 3600) | number:0) >= 2 ? "hours" : "hour"}} ago</span> <span ng-if="(counter >= 86400)">{{(counter / 86400) | number:0 }} {{((counter / 86400)) <= 1.9 ? "day" : "days"}} ago</span> ',
     controller: function($scope, $timeout) {
       $scope.counter = $scope.timer.strtime;
       var callback = function() {
