@@ -120,8 +120,8 @@ angular.module('envite.user', ['ngRoute'])
                         $scope.reg_message = "User already exists."
                     }
                     if (data.success == true) {
+                     //   $rootScope = $rootScope.$new(true);
                         $rootScope.reg_message_success = "Thanks for registering. Please confirm your Display Name"
-                        $rootScope.login_message = ""
                         $scope.login();
                     }
                 });
@@ -226,9 +226,13 @@ angular.module('envite.user', ['ngRoute'])
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).success(function(data) {
+                    if ($rootScope.reg_message_success) {
+                        $rootScope.reg_message_success = null;
+                    }
                     if (data.success == true) {
                         $window.localStorage.setItem('token', data.token);
 
+               //         $rootScope = $rootScope.$new(true);
                         $rootScope.isUserLoggedIn = true;
 
                         if (data.user_displayname) {
