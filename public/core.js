@@ -34,7 +34,7 @@ angular.module('envite', [
 
 .config(['$locationProvider', '$routeProvider',
     function($locationProvider, $routeProvider) {
-        $routeProvider.otherwise({redirectTo: '/login'});
+        $routeProvider.otherwise({redirectTo: '/event_list'});
         $locationProvider.html5Mode(true);
     }
 ])
