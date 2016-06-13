@@ -157,7 +157,7 @@ angular.module('envite.user', ['ngRoute'])
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
-                  if (data.message = "Failed to authenticate token." ){
+                  if (data.message == "Failed to authenticate token." ){
                     $scope.logOut();
                   }else{
                     if (data['user'][0]['username']) {
@@ -216,9 +216,9 @@ angular.module('envite.user', ['ngRoute'])
         };
 
         $scope.login = function() {
-            console.log("sadfasfdasfdsaf")
             $scope.submitted = true;
             if ($scope.fields.password.length < 1) {
+            console.log("sadfasfdasfdsaf")
                 $scope.noPassword = true;
             } else {
                 $http({
