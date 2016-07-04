@@ -82,6 +82,35 @@ exports.new_event = function(req, res){
     });
 }
 
+exports.image_upload = function(req, res){
+console.log("tototot")
+console.log(req.files)
+
+
+
+
+    var file = req.files.file;
+   console.log(file.name);
+   console.log(file.type);
+   console.log(file.path);
+   fs = require('fs')
+fs.readFile(file.path, function (err, data) {
+    if (err) throw err;
+    file_name_loc = './uploads/' + randomValueHex(8) + '_' + file.name;
+    fs.writeFile(file_name_loc, data, function (err) {
+    //fs.writeFile('./uploads/' + randomValueHex(8) + '_' + file.name, data, function (err) {
+        if (err) throw err;
+        console.log('It\'s saved!');
+    });
+});
+
+//   res.send(200, { result: "ok" });
+}
+
+
+
+
+
 exports.delete_event = function(req, res){
     Event.remove({
         _id: req.params.event_id

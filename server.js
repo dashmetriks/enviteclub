@@ -12,6 +12,8 @@ var invites = require('./routes/invites');
 var invitepage = require('./routes/invitepage');
 var sms = require('./routes/sms');
 
+var multiparty = require('connect-multiparty'),
+multipartyMiddleware = multiparty();
 
 var cors = require('cors')
 var mongoose = require('mongoose'); // mongoose for mongodb
@@ -111,6 +113,7 @@ apiRoutes.post('/passwordsave', user.passwordsave);
 apiRoutes.post('/usersave', user.usersave);
 
 apiRoutes.post('/new_event', events.new_event);
+app.post('/image_upload',multipartyMiddleware, events.image_upload);
 apiRoutes.delete('/events/:event_id', events.delete_event);
 apiRoutes.post('/eventsave/:event_id', events.eventsave);
 apiRoutes.get('/my_event_list2',  events.my_event_list2);
