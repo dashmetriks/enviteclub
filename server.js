@@ -114,6 +114,7 @@ apiRoutes.post('/usersave', user.usersave);
 
 apiRoutes.post('/new_event', events.new_event);
 app.post('/image_upload',multipartyMiddleware, events.image_upload);
+app.post('/csv_upload',multipartyMiddleware, sms.csv_upload);
 apiRoutes.delete('/events/:event_id', events.delete_event);
 apiRoutes.post('/eventsave/:event_id', events.eventsave);
 apiRoutes.get('/my_event_list2',  events.my_event_list2);
@@ -132,7 +133,7 @@ apiRoutes.get('/invited/:event_id', invites.invitedlist);
 apiRoutes.post('/addinvite/:event_id/', invites.addinvite); 
 apiRoutes.post('/sendsms/:event_id/', sms.sendsms);
 app.get('/smsdata', sms.smsdata);
-
+apiRoutes.post('/sendcsvsms', sms.sendcsvsms);
 
 app.use('/api', apiRoutes);
 app.use(function(req, res) {

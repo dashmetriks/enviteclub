@@ -26,11 +26,14 @@ exports.new_event = function(req, res){
 
         if (err)
             throw err;
+ console.log(req.body.event_time)
         Event.create({
             event_title: req.body.text,
             event_start: req.body.event_start,
+            event_time: req.body.event_time,
             event_location: req.body.event_location,
             event_creator: req.decoded._doc._id,
+            event_image: req.body.image,
             event_creator_displayname: user.displayname
 
         }, function(err, event_created) {
@@ -96,11 +99,13 @@ console.log(req.files)
    fs = require('fs')
 fs.readFile(file.path, function (err, data) {
     if (err) throw err;
-    file_name_loc = './uploads/' + randomValueHex(8) + '_' + file.name;
+    file_name = randomValueHex(8) + '_' + file.name;
+    file_name_loc = 'public/uploads/' + file_name;
     fs.writeFile(file_name_loc, data, function (err) {
     //fs.writeFile('./uploads/' + randomValueHex(8) + '_' + file.name, data, function (err) {
         if (err) throw err;
         console.log('It\'s saved!');
+        res.json({'file_name': file_name});
     });
 });
 

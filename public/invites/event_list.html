@@ -1,8 +1,50 @@
-<body>
-    <div class="container" ng-controller="invitesController" ng-init="getEventList()">
-        <div class="row">
+<p>
+    <input type="text" placeholder="Search..." ng-model="searchFor" size="20"/>
+  </p>
+
+    <div  ng-controller="invitesController" ng-init="getEventList()">
+                <div style="width: 320px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
+                  <img src='/uploads/{{ event.event_image}}' height=auto width=100%> </br>
+                        <h3><a href='/invite/{{ events_invite[event._id][0]["invite_code"]}}'> {{ event.event_title}} </a>  </h3> Host: {{ event.event_creator_displayname}} </br>
+                        Date: {{ event.event_start | date1:'sdate' }} </br>
+                        Time: {{ event.event_time | date1:'stime' }} </br>
+                        Location: {{ event.event_location}} </br>
+                    <button type="submit" class="btn btn-primary btn-xs" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
+                    <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
+                </div>
+
+<div>
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">I'm a modal!</h3>
+        </div>
+        <div class="modal-body">            <ul>
+          
         <div class="col-md-4 well">
             <form name="eventForm">
+        <div >
+    <pre>Selected date is: <em>{{dt | date:'fullDate' }}</em></pre>
+    <pre>Selected date is: <em>{{dt | date:'shortDate' }}</em></pre>
+
+    <h4>Popup</h4>
+    <div class="row">
+      <div class="col-md-6">
+        <p class="input-group">
+          <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dt" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+        </p>
+      </div>
+      </div>
+      </div>
+
+<uib-timepicker ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
+
+  <pre class="alert alert-info">Time is: {{mytime | date:'shortTime' }}</pre>
+  <pre class="alert alert-info">Time is: {{mytime | date1:'stime' }}</pre>
+
+
                 <div class="form-group" ng-class="{ 'has-error' : eventForm.event_title.$invalid &&  submitted }">
                     <label>Event Title</label>
                     <input type="text" name="event_title" class="form-control input-md text-center" placeholder="Event Title" ng-model="formData.text" required>
@@ -14,24 +56,10 @@
                     <p ng-show="eventForm.event_location.$invalid && submitted" class="help-block">Provide Event Title.</p>
                 </div>
                 <div>
- 
                   <input type="file" nv-file-select="fileSelected($files)" uploader="uploader"  /><br/>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th width="50%">Name</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="item in uploader.queue">
-                                <td>
-                                    <strong>{{ item.file.name }}</strong>
-                                       fsadfdsafds
-                                    <strong>{{ item.file }}</strong>
+                            <div ng-repeat="item in uploader.queue">
                                     <div ng-show="uploader.isHTML5" ng-thumb="{ file: item._file, height: 100 }"></div>
-                                </td>
-                                <td nowrap>
+                                <div>
                                     <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
                                         <span class="glyphicon glyphicon-upload"></span> Upload
                                     </button>
@@ -41,41 +69,29 @@
                                     <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
                                         <span class="glyphicon glyphicon-trash"></span> Remove
                                     </button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        </div>
 
                 </div>
-                <div>
-                <h4>Pick a date and time</h4>
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-sm-10">
-                            <p class="input-group">
-                                <input type="text" class="form-control" datetime-picker="MM/dd/yyyy HH:mm" ng-model="ctrl.dates.date3" is-open="ctrl.open.date3" />
-                                <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" ng-click="ctrl.openCalendar($event, 'date3')"><i class="fa fa-calendar"></i></button>
-                                    </span>
-                            </p>
-                        </div>
-                    </div>
-                </form>
+           
                 <button type="submit" ng-disabled="eventForm.$invalid && submitted" class="btn btn-primary btn-lg" ng-click="createEvent()">Create New Event</button>
             </form>
                     </div>
-        <div class="col-md-4">
-            <div>
-                <div class="well well-sm" ng-repeat="event in events | orderBy:'-_id'">
-                    <label>
-                        <h3><a href='/invite/{{ events_invite[event._id][0]["invite_code"]}}'> {{ event.event_title}} </a>  </h3> Host: {{ event.event_creator_displayname}} </br>
-                        Date: {{ event.event_start}} </br>
-                        Location: {{ event.event_location}} </br>
-                        image: <img src='/uploads/{{ event.event_image}}' height="42" width="42"> </br>
-                    </label>
-                    <button type="submit" class="btn btn-primary btn-xs" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
-                    <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
+                <li ng-repeat="item in items">
+                    <a href="#" ng-click="$event.preventDefault(); selected.item
+ = item">{{ item }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>        </div>
+        <div class="modal-footer">            <button class="btn btn-primary" type="button" ng-click="ok()">OK</bu
+tton>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">Ca
+ncel</button>
+        </div>    </script>
+    <button type="button" class="btn btn-default" ng-click="open()">Open me!</bu
+tton>    <button type="button" class="btn btn-default" ng-click="open('lg')">Large mo
+dal</button>
+    <button type="button" class="btn btn-default" ng-click="open('sm')">Small modal</button>
+    <button type="button" class="btn btn-default" ng-click="toggleAnimation()">Toggle Animation ({{ animationsEnabled }})</button>
+    <div ng-show="selected">Selection from a modal: {{ selected }}</div>
+</div>
+

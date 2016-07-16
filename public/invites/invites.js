@@ -1,6 +1,7 @@
 angular.module('envite.invite', [
     'ngRoute',
     'angularFileUpload',
+    'ngAnimate',
     'ui.bootstrap',
     'ui.bootstrap.datetimepicker',
 ])
@@ -25,6 +26,14 @@ angular.module('envite.invite', [
         })
         .when('/event_list', {
             templateUrl: 'invites/event_list.html',
+            controller: 'invitesController'
+        })
+        .when('/event_add', {
+            templateUrl: 'invites/event_add.html',
+            controller: 'invitesController'
+        })
+        .when('/csv_sms', {
+            templateUrl: 'invites/csv_sms.html',
             controller: 'invitesController'
         })
 }])
@@ -95,88 +104,235 @@ angular.module('envite.invite', [
   };
 })
 
-.controller('invitesController', ['$scope', '$http', '$window', '$location', '$routeParams', '$rootScope', 'FileUploader',
-    function($scope, $http, $window, $location, $routeParams, $rootScope , FileUploader) {
+
+.controller('ModalInstanceCtrl', function ($scope,$rootScope, $uibModalInstance,FileUploader, items) {
+
+
+  $scope.today = function() {
+    $scope.format = 'yyyy/MM/dd';
+    $scope.dt = new Date();
+  };
+  $scope.today();
+
+  $scope.clear = function() {
+    $scope.dt = null;
+  };
+
+ 
+  $scope.inlineOptions = {
+    customClass: getDayClass,
+    minDate: new Date(),
+    showWeeks: true
+  };
+
+  $scope.dateOptions = {
+    dateDisabled: disabled,
+    formatYear: 'yy',
+    maxDate: new Date(2020, 5, 22),
+    minDate: new Date(),
+    startingDay: 1
+  };
+
+  // Disable weekend selection
+  function disabled(data) {
+    var date = data.date,
+      mode = data.mode;
+    return mode === 'day' && (date.getDay() === 0 || date.getDay() === 6);
+  }
+
+  $scope.toggleMin = function() {
+    $scope.inlineOptions.minDate = $scope.inlineOptions.minDate ? null : new Date();
+    $scope.dateOptions.minDate = $scope.inlineOptions.minDate;
+  };
+
+  $scope.toggleMin();
+
+  $scope.open1 = function() {
+    $scope.popup1.opened = true;
+  };
+
+  $scope.open2 = function() {
+    $scope.popup2.opened = true;
+  };
+
+  $scope.setDate = function(year, month, day) {
+    $scope.dt = new Date(year, month, day);
+  };
+
+
+  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+  $scope.format = $scope.formats[3];
+  $scope.altInputFormats = ['M!/d!/yyyy'];
+
+  $scope.popup1 = {
+    opened: false
+  };
+
+  $scope.popup2 = {
+    opened: false
+  };
+
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  var afterTomorrow = new Date();
+  afterTomorrow.setDate(tomorrow.getDate() + 1);
+  $scope.events = [
+    {
+      date: tomorrow,
+      status: 'full'
+    },
+    {
+      date: afterTomorrow,
+      status: 'partially'
+    }
+  ];
+
+  function getDayClass(data) {
+    var date = data.date,
+      mode = data.mode;
+    if (mode === 'day') {
+      var dayToCheck = new Date(date).setHours(0,0,0,0);
+
+      for (var i = 0; i < $scope.events.length; i++) {
+        var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+
+        if (dayToCheck === currentDay) {
+          return $scope.events[i].status;
+        }
+      }
+    }
+
+    return '';
+  }
+  $scope.items = items;
+    console.log($scope.items[1])
+  $scope.selected = {
+    item: $scope.items[0]
+  };
+
+  $scope.ok = function () {
+    $uibModalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function () {
+    $uibModalInstance.dismiss('cancel');
+  };
         var uploader = $scope.uploader = new FileUploader({
-          //  url: 'upload.php'
-            url: 'http://localhost:8080/image_upload'
+            url: express_endpoint + '/image_upload'
         });
+        uploader.onSuccessItem = function(fileItem, response, status, headers) {
+          //  console.info('onSuccessItem', fileItem, response, status, headers);
+          console.log(response['file_name'])
+           console.log($scope.mytime)
+            $rootScope.createEvent(response['file_name'],$scope.formData.text,$scope.formData.event_location,$scope.dt , $scope.mytime );
+        };
+
+// Timepicker controller here
+
+$scope.mytime = new Date();
+
+  $scope.hstep = 1;
+  $scope.mstep = 15;
+
+  $scope.options = {
+    hstep: [1, 2, 3],
+    mstep: [1, 5, 10, 15, 25, 30]
+  };
+
+  $scope.ismeridian = true;
+  $scope.toggleMode = function() {
+    $scope.ismeridian = ! $scope.ismeridian;
+  };
+
+  $scope.update = function() {
+    var d = new Date();
+    d.setHours( 14 );
+    d.setMinutes( 0 );
+    $scope.mytime = d;
+  };
+
+  $scope.changed = function () {
+    $log.log('Time changed to: ' + $scope.mytime);
+  };
+
+  $scope.clear = function() {
+    $scope.mytime = null;
+  };
+})
+
+.filter('date1', function($filter)
+{
+ return function(input,frmt)
+ {
+  if(input == null){ return ""; } 
+ 
+  console.log(frmt)
+  if (frmt == 'sdate'){ 
+   var _date = $filter('date')(new Date(input), 'MMM dd yyyy');
+  }
+  if (frmt == 'stime'){ 
+   var _date = $filter('date')(new Date(input), 'h:mm a');
+  }
+ 
+  return _date;
+
+ };
+})
+
+//.controller('invitesController', ['$scope','$http', '$window', '$location', '$routeParams', '$rootScope', 'FileUploader', 
+.controller('invitesController', 
+    function($scope,   $http, $window, $location, $routeParams, $rootScope , FileUploader, $uibModal) {
+       
+ $scope.items = ['item1', 'item2', 'item3'];
+  $scope.animationsEnabled = true;
+  $scope.open = function (size) {
+    var modalInstance = $uibModal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'myModalContent.html',
+      controller: 'ModalInstanceCtrl',
+      size: size,
+      resolve: {
+        items: function () {
+          return $scope.items;
+        }
+      }
+    });
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+     console.log('Modal dismissed at: ' + new Date());
+    });
+  };
+  $scope.toggleAnimation = function () {
+    $scope.animationsEnabled = !$scope.animationsEnabled;
+  };
+    
+
+
+        $scope.sendCSVSMS = function(phone_number,text) {
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/sendcsvsms',
+                    data: 'phone_number=' + phone_number + '&text=' + text ,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                   console.log(data);
+                   console.log("woot");
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
+
+
 
         $scope.form = {};
         $scope.timers = [];
         $scope.counter2 = 0
-        var that = this;
-
-        var in10Days = new Date();
-        in10Days.setDate(in10Days.getDate() + 10);
-
-        this.dates = {
-            date1: new Date('2015-03-01T00:00:00Z'),
-            date2: new Date('2015-03-01T12:30:00Z'),
-            date3: new Date(),
-            date4: new Date(),
-            date5: in10Days,
-            date6: new Date(),
-            date7: new Date(),
-            date8: new Date(),
-            date9: null,
-            date10: new Date('2015-03-01T09:00:00Z'),
-            date11: new Date('2015-03-01T10:00:00Z')
-        };
-
-        this.open = {
-            date1: false,
-            date2: false,
-            date3: false,
-            date4: false,
-            date5: false,
-            date6: false,
-            date7: false,
-            date8: false,
-            date9: false,
-            date10: false,
-            date11: false
-        };
-
-        // Disable today selection
-        this.disabled = function(date, mode) {
-            return (mode === 'day' && (new Date().toDateString() == date.toDateString()));
-        };
-
-        this.dateOptions = {
-            showWeeks: false,
-            startingDay: 1
-        };
-
-        this.timeOptions = {
-            readonlyInput: false,
-            showMeridian: false
-        };
-
-        this.dateModeOptions = {
-            minMode: 'year',
-            maxMode: 'year'
-        };
-
-        this.openCalendar = function(e, date) {
-            that.open[date] = true;
-        };
-
-        // watch date4 and date5 to calculate difference
-        var unwatch = $scope.$watch(function() {
-            return that.dates;
-        }, function() {
-            if (that.dates.date4 && that.dates.date5) {
-                var diff = that.dates.date4.getTime() - that.dates.date5.getTime();
-                that.dayRange = Math.round(Math.abs(diff / (1000 * 60 * 60 * 24)))
-            } else {
-                that.dayRange = 'n/a';
-            }
-        }, true);
-
-        $scope.$on('$destroy', function() {
-            unwatch();
-        });
 
         $scope.formData = {};
         $scope.formData1 = {};
@@ -383,6 +539,7 @@ angular.module('envite.invite', [
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
+                    console.log(data['my_events'])
                     $scope.events = data['my_events'];
                     $scope.events_invite = data['event_invites'][0];
                     $rootScope.isUserLoggedIn = true;
@@ -595,15 +752,21 @@ angular.module('envite.invite', [
         };
 
 
-        $scope.createEvent = function() {
+        $rootScope.createEvent = function(ffile,title,event_location,event_date,event_time) {
+        console.log(ffile)
+        // $scope.uploader.queue.upload() 
+         console.log("saddddd")
+         
             $scope.submitted = true;
-            if ($scope.formData.text.length < 1) {
+            //if ($scope.formData.text.length < 1) {
+            if (title < 1) {
                 $scope.noEventTitle = true;
             } else {
                 $http({
                         method: 'POST',
                         url: express_endpoint + '/api/new_event',
-                        data: 'text=' + $scope.formData.text + '&event_start=' + $scope.ctrl.dates.date3 + '&event_location=' + $scope.formData.event_location,
+                        data: 'text=' + title + '&event_start=' + event_date + '&event_time=' + event_time + '&event_location=' + event_location + '&image=' + ffile,
+
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'x-access-token': $window.localStorage.getItem('token')
@@ -729,4 +892,4 @@ $scope.timers = [];
                 });
         };
     }
-]);
+);
