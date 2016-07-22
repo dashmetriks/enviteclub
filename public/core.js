@@ -11,7 +11,7 @@ var interceptor = function($q, $location) {
         responseError: function(rejection) {
             console.log('Failed with', rejection.status, 'status');
             if (rejection.status == 403) {
-                $location.url('/login');
+                $location.url('/all_events');
             }
             if (rejection.status == 404) {
                 $location.url('/event_list');

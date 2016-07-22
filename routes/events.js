@@ -3,6 +3,7 @@ var User = require('../app/models/user');
 var Invite = require('../app/models/invites');
 var Event = require('../app/models/events');
 var Player = require('../app/models/players');
+var Comments = require('../app/models/comments');
 var async = require("async");
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
@@ -154,6 +155,7 @@ exports.my_event_list2 = function(req, res){
     var player_data3 = []
     var player_no_count = []
     var pushY = {};
+    var comments_array = {}
     var pushN = {};
     var pushList = {};
     var invites_cnt = {};
@@ -192,9 +194,14 @@ exports.my_event_list2 = function(req, res){
                                         event_id: events.event_id
                                     },
                                     function(err, invite_count) {
-                                        if (err)
-                                            res.send(err)
-                                            //            Player.find({event_id: events.event_id},
+                                        if (err) res.send(err)
+
+                                  Comments.count({
+                                        event_id: events.event_id
+                                    },
+                                    function(err, comments_count) {
+                                        if (err) res.send(err)
+
                                         Player.find({
                                                 user_id: req.decoded._doc._id,
                                                 event_id: events.event_id
@@ -206,11 +213,13 @@ exports.my_event_list2 = function(req, res){
                                                 pushList[events.event_id] = players_list
                                                 pushN[events.event_id] = players_no
                                                 pushY[events.event_id] = players_yes
+                                                comments_array[events.event_id] = comments_count
                                                 invites_cnt[events.event_id] = invite_count
                                                 callback();
                                             });
                                     });
                             });
+                    });
                     });
             }, function(err) {
                 res.json({
@@ -219,6 +228,92 @@ exports.my_event_list2 = function(req, res){
                     'event_invites': [pushList],
                     //  'event_invites': player_data3,
                     'event_no': [pushN],
+                    'comments_count': [comments_array],
+                    'invites': [invites_cnt]
+                });
+            });
+        });
+}
+
+exports.all_events = function(req, res){
+    var player_data = []
+    var player_data2 = []
+    var player_data3 = []
+    var player_no_count = []
+    var pushY = {};
+    var comments_array = {}
+    var pushN = {};
+    var pushList = {};
+    var invites_cnt = {};
+    Event.find({ }, null, {
+            sort: {
+                "created_at": -1
+            }
+        },
+        function(err, records) {
+      console.log(records);
+            async.each(records, function(events, callback) {
+                Event.findOne({
+                        _id: events._id
+                    },
+                    function(err, events2) {
+                        if (err)
+                            res.send(err)
+                        player_data.push(events2);
+                    });
+                Player.count({
+                        event_id: events._id,
+                        in_or_out: 'No'
+                    },
+                    function(err, players_no) {
+                        if (err)
+                            res.send(err)
+                        Player.count({
+                                event_id: events._id,
+                                in_or_out: 'Yes'
+                            },
+                            function(err, players_yes) {
+                                if (err)
+                                    res.send(err)
+                                Invite.count({
+                                        event_id: events._id
+                                    },
+                                    function(err, invite_count) {
+                                        if (err) res.send(err)
+
+                                  Comments.count({
+                                        event_id: events._id
+                                    },
+                                    function(err, comments_count) {
+                                        if (err) res.send(err)
+
+                                        Player.find({
+                                            //    user_id: req.decoded._doc._id,
+                                                event_id: events._id
+                                            },
+                                            function(err, players_list) {
+                                                if (err)
+                                                    res.send(err)
+                                                    // player_data3.push(players_list);
+                                                pushList[events._id] = players_list
+                                                pushN[events._id] = players_no
+                                                pushY[events._id] = players_yes
+                                                comments_array[events._id] = comments_count
+                                                invites_cnt[events._id] = invite_count
+                                                callback();
+                                            });
+                                    });
+                            });
+                    });
+                    });
+            }, function(err) {
+                res.json({
+                    'my_events': player_data,
+                    'event_yes': [pushY],
+                    'event_invites': [pushList],
+                    //  'event_invites': player_data3,
+                    'event_no': [pushN],
+                    'comments_count': [comments_array],
                     'invites': [invites_cnt]
                 });
             });

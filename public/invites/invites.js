@@ -16,6 +16,10 @@ angular.module('envite.invite', [
             templateUrl: 'invites/invited_list.html',
             controller: 'invitesController'
         })
+        .when('/event/:event_id', {
+            templateUrl: 'invites/event.html',
+            controller: 'invitesController'   // getEvent()
+        })
         .when('/invited_list2/:event_id', {
             templateUrl: 'invites/invited_list2.html',
             controller: 'invitesController'
@@ -26,6 +30,10 @@ angular.module('envite.invite', [
         })
         .when('/event_list', {
             templateUrl: 'invites/event_list.html',
+            controller: 'invitesController'
+        })
+        .when('/all_events', {
+            templateUrl: 'invites/all_events.html',
             controller: 'invitesController'
         })
         .when('/event_add', {
@@ -225,6 +233,7 @@ angular.module('envite.invite', [
           console.log(response['file_name'])
            console.log($scope.mytime)
             $rootScope.createEvent(response['file_name'],$scope.formData.text,$scope.formData.event_location,$scope.dt , $scope.mytime );
+          $scope.ok();
         };
 
 // Timepicker controller here
@@ -539,9 +548,11 @@ $scope.mytime = new Date();
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
-                    console.log(data['my_events'])
+                    console.log(data['comments_count'])
                     $scope.events = data['my_events'];
                     $scope.events_invite = data['event_invites'][0];
+                    $scope.events_yes_count = data['event_yes'];
+                    $scope.events_comments_count = data['comments_count'];
                     $rootScope.isUserLoggedIn = true;
 
                 })
@@ -550,6 +561,29 @@ $scope.mytime = new Date();
                 });
         };
 
+        $scope.allEvents = function() {
+            $http({
+                    method: 'GET',
+                    url: express_endpoint + '/get_all_events/',
+                    headers: {
+                        'Content-Type': 'application/json',
+                //        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                    console.log(data['comments_count'])
+                    $scope.events = data['my_events'];
+                    $scope.events_invite = data['event_invites'][0];
+                    $scope.events_yes_count = data['event_yes'];
+                    $scope.events_comments_count = data['comments_count'];
+            if ($window.localStorage.getItem('token') == null) {
+                      $rootScope.isUserLoggedIn = true;
+                    }
+
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
         $scope.getInvites = function(id) {
             $http({
                     method: 'GET',
@@ -613,6 +647,7 @@ $scope.mytime = new Date();
                     headers: head
                 }).success(function(data) {
                     $scope.timers = [];
+                    $scope.event_data = data['event'][0];
                     $scope.event_title = data['event'][0].event_title;
                     $scope.event_date = data['event'][0].event_start;
                     $scope.event_creator_displayname = data['event'][0].event_creator_displayname;
@@ -662,14 +697,95 @@ $scope.mytime = new Date();
 
 
         $scope.getEvent = function(id) {
+            if ($window.localStorage.getItem('token') == null) {
+                $rootScope.showLoginlink = true;
+                var endpoint = express_endpoint + '/geteventanon/' + $routeParams.event_id
+                var head = {
+                    'Content-Type': 'application/json'
+                }
+            } else if ($window.localStorage.getItem('token').length < 10) {
+                $rootScope.showLoginlink = true;
+                var endpoint = express_endpoint + '/geteventanon/' + $routeParams.event_id
+                var head = {
+                    'Content-Type': 'application/json'
+                }
+            } else {
+                var endpoint = express_endpoint + '/api/getevent/' + $routeParams.event_id
+                var head = {
+                    'Content-Type': 'application/json',
+                    'x-access-token': $window.localStorage.getItem('token')
+                }
+                $rootScope.isUserLoggedIn = true;
+            }
             $http({
                     method: 'GET',
-                    url: express_endpoint + '/api/geteventdata/' + $routeParams.event_id,
+                    url: endpoint,
+                    headers: head
+                }).success(function(data) {
+                    console.log(data)
+                    $scope.timers = [];
+                    $scope.event_data = data['event'][0];
+                    $scope.event_creator_id = data['event'][0].event_creator;
+                    $scope.event_id = data['event'][0]._id;
+                    $scope.yeses = data['players_yes'];
+                    $scope.nos = data['players_no'];
+                    $scope.date_now = data['date_now'];
+                    $scope.players_list = data['players_list'];
+                    $scope.comments = data['comments'];
+                    $scope.loggedInUsername = data['logged_in_username'];
+                    if (data['is_member'].length > 0) {
+                        $scope.invited = {
+                            username: data['is_member'][0].username,
+                            displayname: data['is_member'][0].displayname
+                        };
+                        $scope.set = function(invited_username) {
+                            this.invited.username = invited_username;
+                        }
+                        $scope.set = function(invited_displayname) {
+                            this.invited.displayname = invited_displayname;
+                        }
+                        $scope.checkboxModel = {
+                            rsvp: data['is_member'][0].notice_rsvp,
+                            comment_alert: data['is_member'][0].notice_comments
+                        };
+
+                        $scope.invited_reply = data['is_member'][0].in_or_out;
+                        $scope.invite_code = data['is_member'][0].invite_code;
+                        $scope.ustatus = data['is_member'][0].in_or_out;
+                        $rootScope.isMember = true;
+                        $rootScope.newInvite = false;
+                    } else {
+                        $rootScope.isMember = false;
+                        $rootScope.newInvite = true;
+                    }
+                    if (data['event'][0].event_creator == data['logged_in_userid']) {
+                        $rootScope.isEventCreator = true;
+                        $rootScope.isMember = true;
+                    }
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
+
+
+        $scope.getEvent99 = function(id) {
+            if ($window.localStorage.getItem('token') == null) {
+                $rootScope.showLoginlink = true;
+            } else if ($window.localStorage.getItem('token').length < 10) {
+                $rootScope.showLoginlink = true;
+            } else {
+                $rootScope.isUserLoggedIn = true;
+            }
+            $http({
+                    method: 'GET',
+                    url: express_endpoint + '/geteventdata/' + $routeParams.event_id,
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-access-token': $window.localStorage.getItem('token')
+          //              'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
+                    console.log(data)
                     $scope.timers = []; 
                     $scope.event_title = data['event'][0].event_title;
                     $scope.event_date = data['event'][0].event_start;
@@ -719,13 +835,44 @@ $scope.mytime = new Date();
                 });
         };
 
+        $scope.addComment = function(id, ustatus, commentsForm) {
+            if (ustatus == 'none') {
+                Comments = $scope.formData.comments
+            } else {
+                Comments = $scope.formData.text
+            }
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/addcomment/' + $routeParams.event_id,
+                    data: 'comment=' + Comments, 
+
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                    if (Comments) {
+                        $scope.form.myForm2.$setPristine();
+                        delete $scope.formData.comments
+                        delete $scope.formData.text
+                    }
+                    $scope.showAcceptInvite = false;
+                    $scope.changeSettingsAnon = false;
+                    $scope.changeSettings = false;
+                    $scope.newInvite = false;
+                    $scope.getEvent();
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
+
         $scope.addEvent = function(id, ustatus, commentsForm) {
             if (ustatus == 'none') {
                 Comments = $scope.formData.comments
             } else {
                 Comments = $scope.formData.text
             }
-
             $http({
                     method: 'POST',
                     url: express_endpoint + '/adduserevent2/' + id + '/' + ustatus + '/' + $routeParams.invite_code,
@@ -802,7 +949,7 @@ $scope.mytime = new Date();
                 });
         };
 
-        $scope.addComment = function() {
+        $scope.addCommentooold = function() {
                     console.log('asdfdsfsa');
             $http({
                     method: 'POST',
@@ -856,6 +1003,7 @@ $scope.timers = [];
                     console.log('Error: ' + data);
                 });
         };
+
         $scope.addInvite = function() {
             $http({
                     method: 'POST',
@@ -875,6 +1023,23 @@ $scope.timers = [];
                 });
         };
 
+        $scope.joinEvent = function(ustatus) {
+            $http({
+                    method: 'get',
+                    url: express_endpoint + '/api/join_event/' + $routeParams.event_id + '/' + ustatus ,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+            console.log(data);
+            console.log('asdfads');
+                   $scope.getEvent();
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
 
         $scope.getSMS = function() {
             $http({

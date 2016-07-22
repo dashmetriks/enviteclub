@@ -51,9 +51,63 @@ exports.getinvite = function(req, res){
         });
 }
 
-exports.adduserevent2 = function(req, res){
+exports.join_event = function(req, res){
+    User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+        if (err) throw err;
 
-//app.post('/adduserevent2/:event_id/:ustatus/:invite_code', function(req, res) {
+    Player.findOne({
+        event_id: req.params.event_id,
+        user_id: req.decoded._doc._id,
+    }, function(error, players) {
+        if (error)
+            res.json(error);
+        if (players == null) {
+                    Player.create({
+                            event_id: req.params.event_id,
+                            user_id: req.decoded._doc._id,
+                            username: user.username, 
+                            displayname: user.displayname,
+                            in_or_out: 'Yes' 
+
+                   //         invite_code: req.params.invite_code,
+                    //        notice_rsvp: req.body.rsvp,
+                            //         user_id: usernew._id,
+                     //       notice_comments: req.body.comment_alert,
+                  //          displayname: req.body.displayname,
+                   //         in_or_out: req.params.ustatus
+                        },
+                        function(err, result) {
+                            if (err)
+                                throw err;
+                return res.status(200).send({
+                    success: true,
+                    message: 'User added to event'
+                });
+            });
+      } else {
+
+                Player.update({
+                        event_id: req.params.event_id,
+                        user_id: req.decoded._doc._id,
+                    }, {
+                        $set: {
+                            in_or_out: req.params.ustatus
+                        }
+                    },
+                    function(err, result) {
+                        if (err)
+                            throw err;
+                return res.status(200).send({
+                    success: true,
+                    message: 'User Changed status'
+                });
+                    });
+
+      }
+    });
+    });
+}
+exports.adduserevent2 = function(req, res){
     var new_user_id
     console.log(req.body)
     Player.findOne({
@@ -156,6 +210,7 @@ exports.adduserevent2 = function(req, res){
 
 
 exports.addcomment = function(req, res){
+console.log(req.decoded._doc)
     async.series([
         function(callback) {
             Player.findOne({
@@ -164,17 +219,20 @@ exports.addcomment = function(req, res){
                 if (error) {
                     res.json(error);
                 } else if (comments == null) {} else {
-                    Comments.create({
+                   User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+                     if (err) throw err;
+                     Comments.create({
                             event_id: req.params.event_id,
-                            displayname: req.decoded._doc.displayname,
+                            displayname: user.displayname,
                             user_id: req.decoded._doc._id,
-                            text: req.body.text
+                            text: req.body.comment
                         },
                         function(err, result) {
                             if (err)
                                 throw err;
                             callback(null, 'one');
                         });
+                   });
                 };
             });
         },
@@ -215,7 +273,17 @@ exports.geteventinvite = function(req, res){
 }
 
 exports.geteventdata = function(req, res){
+   // get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {
+    get_event_data(req.params.event_id, "na", function(data) {
+        res.json(data);
+    })
+}
+
+exports.getevent = function(req, res){
+console.log("exports.getevent")
+   // get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {
     get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {
+        console.log(req.params.event_id)
         res.json(data);
     })
 }
@@ -265,7 +333,8 @@ function get_event_data(event_id, user_id, callback) {
                         res.send(err)
                     Player.find({
                             event_id: event_id,
-                            invite_code: user_id
+                           // invite_code: user_id
+                            user_id: user_id
                         },
                         function(err, is_member) {
                             if (err)

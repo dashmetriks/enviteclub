@@ -3,11 +3,13 @@
     <button type="button" class="btn btn-default" ng-show="isUserLoggedIn" ng-click="open()">Create New Event</button>  
   </p>
 
-    <div  ng-controller="invitesController" ng-init="getEventList()">
+    <div  ng-controller="invitesController" ng-init="allEvents()">
                 <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
+                  <a href='/event/{{ event._id }}'>
                   <img src='/uploads/{{ event.event_image}}' height=auto width=100%> </br>
+                  </a>
     <div style="padding-left:10px; padding-bottom:10px">
-                        <h4><a href='/invite/{{ events_invite[event._id][0]["invite_code"]}}'> {{ event.event_title}} </a>  </h4> 
+                        <h4><a href='/event/{{ event._id }}'> {{ event.event_title}} </a>  </h4> 
                         Date: {{ event.event_start | date1:'sdate' }} {{ event.event_time | date1:'stime' }} </br>
                         Location: {{ event.event_location}}<br>
                         Yeses: {{ events_yes_count[0][event._id] }}<br>

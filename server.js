@@ -118,16 +118,22 @@ app.post('/csv_upload',multipartyMiddleware, sms.csv_upload);
 apiRoutes.delete('/events/:event_id', events.delete_event);
 apiRoutes.post('/eventsave/:event_id', events.eventsave);
 apiRoutes.get('/my_event_list2',  events.my_event_list2);
+app.get('/get_all_events',  events.all_events);
+
+app.get('/geteventdata/:event_id', invitepage.geteventdata); 
 
 app.post('/adduserevent2/:event_id/:ustatus/:invite_code', invitepage.adduserevent2);
+apiRoutes.get('/join_event/:event_id/:ustatus', invitepage.join_event);
 
 apiRoutes.post('/addcomment/:event_id/',  invitepage.addcomment);
 
-apiRoutes.get('/geteventdata/:event_id', invitepage.geteventdata); 
 app.get('/geteventinviteanon/:invite_code', invitepage.geteventinviteanon); 
+apiRoutes.get('/geteventinvite/:invite_code', invitepage.geteventinvite);
+
+//app.get('/geteventanon/:invite_code', invitepage.geteventanon); 
+apiRoutes.get('/getevent/:event_id', invitepage.getevent);
 
 app.get('/invites/:invite_code', invitepage.getinvite);
-apiRoutes.get('/geteventinvite/:invite_code', invitepage.geteventinvite);
 apiRoutes.get('/invited/:event_id', invites.invitedlist);
 
 apiRoutes.post('/addinvite/:event_id/', invites.addinvite); 
