@@ -294,6 +294,26 @@ $scope.mytime = new Date();
        
  $scope.items = ['item1', 'item2', 'item3'];
   $scope.animationsEnabled = true;
+
+  $scope.openLoginModal = function (size) {
+    var modalInstance = $uibModal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'loginModal.html',
+      controller: 'ModalInstanceCtrl',
+      size: size,
+      resolve: {
+        items: function () {
+          return $scope.items;
+        }
+      }
+    });
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+     console.log('Modal dismissed at: ' + new Date());
+    });
+  };
   $scope.open = function (size) {
     var modalInstance = $uibModal.open({
       animation: $scope.animationsEnabled,
@@ -313,6 +333,7 @@ $scope.mytime = new Date();
      console.log('Modal dismissed at: ' + new Date());
     });
   };
+
   $scope.toggleAnimation = function () {
     $scope.animationsEnabled = !$scope.animationsEnabled;
   };
@@ -733,6 +754,7 @@ $scope.mytime = new Date();
                     $scope.players_list = data['players_list'];
                     $scope.comments = data['comments'];
                     $scope.loggedInUsername = data['logged_in_username'];
+                    $scope.logged_in_userid = data['logged_in_userid'];
                     if (data['is_member'].length > 0) {
                         $scope.invited = {
                             username: data['is_member'][0].username,
@@ -1056,5 +1078,45 @@ $scope.timers = [];
                     console.log('Error: ' + data);
                 });
         };
-    }
-);
+
+        $scope.loginEvent = function() {
+           console.log( $scope.fields.username) 
+         console.log($scope.fields.password)
+            $scope.submitted = true;
+            if ($scope.fields.password.length < 1) {
+            console.log("sadfasfdasfdsaf")
+                $scope.noPassword = true;
+            } else {
+                $http({
+                    method: 'POST',
+                    url: express_endpoint + '/authenticate',
+                    //data: 'name=' + $scope.user.username + '&password=' + $scope.user.password,
+                    data: 'name=' + $scope.fields.username + '&password=' + $scope.fields.password,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).success(function(data) {
+                    if ($rootScope.reg_message_success) {
+                        $rootScope.reg_message_success = null;
+                    }
+                    if (data.success == true) {
+                        $window.localStorage.setItem('token', data.token);
+
+               //         $rootScope = $rootScope.$new(true);
+                        $rootScope.isUserLoggedIn = true;
+                       console.log("woeododododo")
+/*
+                        if (data.user_displayname) {
+                            $location.url('/event_list');
+                        } else {
+                            $location.url('/user');
+                        }
+*/
+                    } else {
+                        $scope.login_message = data.message
+                    }
+
+                });
+            }
+        }
+    });

@@ -1,4 +1,45 @@
 <body ng-controller="invitesController">
+
+    <script type="text/ng-template" id="loginModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Login bs</h3>
+        </div>
+        <div class="modal-body">          
+        <div class="well">
+            <form name="eventForm">
+        <div >
+
+    <div class="container" ng-init="loginForm()">
+        <div class="col-md-5">
+            <h3> Login {{ loginForm }} </h3>
+            <form name="userForm" class="well">
+                <!-- EMAIL -->
+                <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid &&  submitted }">
+                    <label>Email</label>
+                    <input type="email" class="form-control" name="username" ng-model="user.username" required/>
+                    <p ng-show="userForm.username.$invalid && submitted" class="help-block">Provide Valid Email.</p>
+                </div>
+                <!-- password1 -->
+                <div class="form-group" ng-class="{ 'has-error' : userForm.password.$invalid &&  submitted }">
+                    <label>Password</label>
+                    <input id="password" name="password" ng-model="fields.password" class="form-control" required type="password" />
+                    <p ng-show="(userForm.password.$invalid && submitted) || noPassword" class="help-block">Password is required.</p>
+                </div>
+                <input type="button" value="Login" ng-click="login()" class="btn btn-primary" />
+            </form>
+            <h3> {{login_message}} </h3>
+            <h4><a href="/register">Register</a> *  <a href="/password_reset">Reset Password</a>  </h4>
+        </div>
+      </div>
+
+
+     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        </div>    
+</script>
+
+
+
+
     <div class="container" ng-init="getEvent()">
         <!-- HEADER AND TODO COUNT -->
         <div class="row">
@@ -60,8 +101,8 @@
                     <label> You Replied {{invited_reply}} </label>
                     <div class="button-bar">
                         <!--  <input  class="btn btn-primary btn-lg {{(ustatus == 'Yes')}}" type="button" value="Yes" ng-click="invite_open( 'Yes')"> -->
-                        <input ng-class="{'Yes':'btn-success', 1:'two',2:'three'}[ustatus]" type="button" value="Yes" ng-click="joinEvent('Yes')">
-                        <input ng-class="{'No':'btn-danger', 1:'two',2:'three'}[ustatus]" type="button" value="No" ng-click="joinEvent('No')">
+                        <input ng-class="{'Yes':'btn-success', 1:'two',2:'three'}[ustatus]" type="button" value="Yes" ng-click="joinEvent('Yes')" class="btn btn-default">
+                        <input ng-class="{'No':'btn-danger', 1:'two',2:'three'}[ustatus]" type="button" value="No" ng-click="joinEvent('No')" class="btn btn-default">
                         <!--  <input ng-class="{'Maybe':'btn-warning', 1:'two',2:'three'}[ustatus]" type="button" value="Maybe" ng-click="addEvent(event_id, 'Maybe', 'nocomment')"> -->
                     </div>
                     <form class="well" name="form.myForm2">
@@ -71,11 +112,35 @@
                     </form>
                 </div>
                 <!-- ng-if="isMember" -->
-                <div ng-if="newInvite" class="button-bar">
+    <div class="container" ng-hide="isUserLoggedIn" >
+        <div class="col-md-4">
+            <h3> Login {{ loginForm }} </h3>
+            <form name="userForm" class="well">
+                <!-- EMAIL -->
+                <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid &&  submitted }">
+                    <label>Email</label>
+                    <input type="email" class="form-control" name="username" ng-model="fields.username" required/>
+                    <p ng-show="userForm.username.$invalid && submitted" class="help-block">Provide Valid Email.</p>
+                </div>
+                <!-- password1 -->
+                <div class="form-group" ng-class="{ 'has-error' : userForm.password.$invalid &&  submitted }">
+                    <label>Password</label>
+                    <input id="password" name="password" ng-model="fields.password" class="form-control" required type="password" />
+                    <p ng-show="(userForm.password.$invalid && submitted) || noPassword" class="help-block">Password is required.</p>
+                </div>
+                <input type="button" value="Login" ng-click="loginEvent()" class="btn btn-primary" />
+            </form>
+            <h3> {{login_message}} </h3>
+            <h4><a href="/register">Register</a> *  <a href="/password_reset">Reset Password</a>  </h4>
+        </div>
+      </div>
+                <div ng-show="isUserLoggedIn" class="button-bar">
+                  <div ng-hide="isMember" class="button-bar">
                     <!--  <input  class="btn btn-primary btn-lg {{(ustatus == 'Yes')}}" type="button" value="Yes" ng-click="invite_open( 'Yes')"> -->
-                    <input ng-class="{'Yes':'btn-success', 1:'two',2:'three'}[ustatus]" type="button" value="Yes" ng-click="joinEvent('Yes')">
-                    <input ng-class="{'No':'btn-danger', 1:'two',2:'three'}[ustatus]" type="button" value="No" ng-click="invite_open('No')">
+                    <input ng-class="{'Yes':'btn-success', 1:'two',2:'three'}[ustatus]" type="button" value="Join Event" ng-click="joinEvent('Yes')" class="btn btn-default">
+                    <input ng-class="{'No':'btn-danger', 1:'two',2:'three'}[ustatus]" type="button" value="No" ng-click="invite_open('No')" class="btn btn-default">
                     <!--  <input ng-class="{'Maybe':'btn-warning', 1:'two',2:'three'}[ustatus]" type="button" value="Maybe" ng-click="invite_open('Maybe')"> -->
+                </div>
                 </div>
                 <!-- ng-if="newInvite" -->
                 <div ng-if="changeSettingsAnon">
@@ -164,12 +229,12 @@
                 <div class="well well-sm">
                     <div ng-repeat="user in yeses">
                         {{user.in_or_out}} - {{user.displayname}}
-                        <b>  <span ng-if="invite_code == user.invite_code"> -- You </span> </b>
+                        <b>  <span ng-if="logged_in_userid == user.user_id"> -- You </span> </b>
                         <i> <span ng-if="event_creator_id == user.user_id"> Host </span> </i>
                     </div>
                     <div ng-repeat="user in nos">
                         {{user.in_or_out}} - {{user.displayname}}
-                        <b>  <span ng-if="invite_code == user.invite_code"> -- You </span> </b>
+                        <b>  <span ng-if="logged_in_userid == user.user_id"> -- You </span> </b>
                         <i> <span ng-if="event_creator_id == user.user_id"> Host </span> </i>
                     </div>
                 </div>

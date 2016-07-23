@@ -279,6 +279,16 @@ exports.geteventdata = function(req, res){
     })
 }
 
+exports.geteventanon  = function(req, res){
+console.log("exports.geteventanon ")
+   // get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {
+    get_event_data(req.params.event_id, "anon", function(data) {
+        console.log(req.params.event_id)
+        res.json(data);
+    })
+}
+
+
 exports.getevent = function(req, res){
 console.log("exports.getevent")
    // get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {

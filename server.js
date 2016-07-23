@@ -130,7 +130,7 @@ apiRoutes.post('/addcomment/:event_id/',  invitepage.addcomment);
 app.get('/geteventinviteanon/:invite_code', invitepage.geteventinviteanon); 
 apiRoutes.get('/geteventinvite/:invite_code', invitepage.geteventinvite);
 
-//app.get('/geteventanon/:invite_code', invitepage.geteventanon); 
+app.get('/geteventanon/:event_id', invitepage.geteventanon); 
 apiRoutes.get('/getevent/:event_id', invitepage.getevent);
 
 app.get('/invites/:invite_code', invitepage.getinvite);
