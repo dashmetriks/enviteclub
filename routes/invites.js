@@ -78,8 +78,8 @@ exports.addinvite = function(req, res){
                     transporter.sendMail({
                         from: config.username,
                         to: req.body.email,
-                        subject: 'You just joined to the event ' + events[0]["event_title"] + ' at ' + events[0]["event_start"],
-                        html: 'You just joined to the event <a href="' + config.endpoint + '/event/' + req.params.event_id + '">' + events[0]["event_title"] + '</a>' + ' at ' + events[0]["event_start"],
+                        subject: 'You are invited to the event ' + events[0]["event_title"] + ' at ' + events[0]["event_start"],
+                        html: 'You are invited to the event <a href="' + config.endpoint + '/event/' + req.params.event_id + '">' + events[0]["event_title"] + '</a>' + ' at ' + events[0]["event_start"],
                     });
                     transporter.close();
                     if (err)

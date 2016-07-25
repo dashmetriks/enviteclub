@@ -114,7 +114,7 @@
                 <!-- ng-if="isMember" -->
     <div class="container" ng-hide="isUserLoggedIn" >
         <div class="col-md-4">
-            <h3> Login {{ loginForm }} </h3>
+            <h4> Login to Join this Event </h4>
             <form name="userForm" class="well">
                 <!-- EMAIL -->
                 <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid &&  submitted }">
@@ -138,8 +138,8 @@
                   <div ng-hide="isMember" class="button-bar">
                     <!--  <input  class="btn btn-primary btn-lg {{(ustatus == 'Yes')}}" type="button" value="Yes" ng-click="invite_open( 'Yes')"> -->
                     <input ng-class="{'Yes':'btn-success', 1:'two',2:'three'}[ustatus]" type="button" value="Join Event" ng-click="joinEvent('Yes')" class="btn btn-default">
-                    <input ng-class="{'No':'btn-danger', 1:'two',2:'three'}[ustatus]" type="button" value="No" ng-click="invite_open('No')" class="btn btn-default">
-                    <!--  <input ng-class="{'Maybe':'btn-warning', 1:'two',2:'three'}[ustatus]" type="button" value="Maybe" ng-click="invite_open('Maybe')"> -->
+                 <!--   <input ng-class="{'No':'btn-danger', 1:'two',2:'three'}[ustatus]" type="button" value="No" ng-click="invite_open('No')" class="btn btn-default">
+                      <input ng-class="{'Maybe':'btn-warning', 1:'two',2:'three'}[ustatus]" type="button" value="Maybe" ng-click="invite_open('Maybe')"> -->
                 </div>
                 </div>
                 <!-- ng-if="newInvite" -->

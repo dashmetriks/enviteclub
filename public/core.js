@@ -14,7 +14,7 @@ var interceptor = function($q, $location) {
                 $location.url('/all_events');
             }
             if (rejection.status == 404) {
-                $location.url('/event_list');
+                $location.url('/all_events');
             }
             return $q.reject(rejection);
         }
@@ -34,7 +34,7 @@ angular.module('envite', [
 
 .config(['$locationProvider', '$routeProvider',
     function($locationProvider, $routeProvider) {
-        $routeProvider.otherwise({redirectTo: '/event_list'});
+        $routeProvider.otherwise({redirectTo: '/all_events'});
         $locationProvider.html5Mode(true);
     }
 ])
@@ -53,6 +53,7 @@ angular.module('envite', [
         }
     };
 })
+
 
 .factory('urls', function(config) {
     return {

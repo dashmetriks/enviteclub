@@ -112,7 +112,13 @@ angular.module('envite.invite', [
   };
 })
 
-
+.directive('navbar', function () {
+    return {
+      restrict: 'E',
+      templateUrl: 'navbar.html',
+//      controller: 'NavbarCtrl',
+    };
+  })
 .controller('ModalInstanceCtrl', function ($scope,$rootScope, $uibModalInstance,FileUploader, items) {
 
 
@@ -402,7 +408,7 @@ $scope.mytime = new Date();
         $scope.logOut = function() {
             $window.localStorage['token'] = null;
             $rootScope.isUserLoggedIn = false;
-            $location.url('/login');
+            $location.url('/all_events');
         }
 
         $scope.display_reg_form = function() {
@@ -543,6 +549,8 @@ $scope.mytime = new Date();
                         $scope.username = data['user'][0].username
                         if (data['user'][0].displayname) {
                             $scope.displayname = data['user'][0].displayname;
+                            $rootScope.display_name = data['user'][0].displayname;
+                            
                         } else {
                             $scope.displayname = data['user'][0].username.split('@')[0];
                         }
@@ -597,8 +605,13 @@ $scope.mytime = new Date();
                     $scope.events_yes_count = data['event_yes'];
                     $scope.events_comments_count = data['comments_count'];
             if ($window.localStorage.getItem('token') == null) {
-                      $rootScope.isUserLoggedIn = true;
-                    }
+                $rootScope.showLoginlink = true;
+            } else if ($window.localStorage.getItem('token').length < 10) {
+                $rootScope.showLoginlink = true;
+            } else {
+                $rootScope.isUserLoggedIn = true;
+                $scope.checkLogin();
+            }
 
                 })
                 .error(function(data) {
