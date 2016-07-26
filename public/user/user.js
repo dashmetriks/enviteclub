@@ -208,7 +208,7 @@ angular.module('envite.user', ['ngRoute'])
                     if ($rootScope.reg_message_success) {
                         $rootScope.reg_message_success = null;
                     }
-                    $location.url('/event_list');
+                    $location.url('/all_events');
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
