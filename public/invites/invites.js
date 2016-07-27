@@ -1,6 +1,7 @@
 angular.module('envite.invite', [
     'ngRoute',
     'angularFileUpload',
+    'ngFileUpload',
     'ngAnimate',
     'ui.bootstrap',
     'ui.bootstrap.datetimepicker',
@@ -28,7 +29,7 @@ angular.module('envite.invite', [
             templateUrl: 'invites/rest_queue.html',
             controller: 'invitesController'
         })
-        .when('/event_list', {
+        .when('/my_events', {
             templateUrl: 'invites/event_list.html',
             controller: 'invitesController'
         })
@@ -119,7 +120,32 @@ angular.module('envite.invite', [
 //      controller: 'NavbarCtrl',
     };
   })
-.controller('ModalInstanceCtrl', function ($scope,$rootScope, $uibModalInstance,FileUploader, items) {
+.controller('ModalInstanceCtrl', function ($scope,$rootScope, $uibModalInstance,FileUploader, items, Upload,$timeout) {
+
+$scope.uploadPic = function(file) {
+    console.log("uploadPic dadsfdsafads")
+    file.upload = Upload.upload({
+    //  url: 'https://angular-file-upload-cors-srv.appspot.com/upload',
+      url: express_endpoint + '/image_upload',
+      data: {username: $scope.username, file: file},
+    });
+
+    file.upload.then(function (response) {
+      $timeout(function () {
+        console.log("foo")
+        console.log(response.data['file_name'])
+        file.result = response.data;
+            $rootScope.createEvent(response.data['file_name'],$scope.formData.text,$scope.formData.event_location,$scope.dt , $scope.mytime );
+          $scope.ok();
+      });
+    }, function (response) {
+      if (response.status > 0)
+        $scope.errorMsg = response.status + ': ' + response.data;
+    }, function (evt) {
+      // Math.min is to fix IE which reports 200% sometimes
+      file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+    });
+    }
 
 
   $scope.today = function() {
@@ -231,6 +257,8 @@ angular.module('envite.invite', [
   $scope.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
+
+/* old image uploader
         var uploader = $scope.uploader = new FileUploader({
             url: express_endpoint + '/image_upload'
         });
@@ -241,6 +269,7 @@ angular.module('envite.invite', [
             $rootScope.createEvent(response['file_name'],$scope.formData.text,$scope.formData.event_location,$scope.dt , $scope.mytime );
           $scope.ok();
         };
+*/
 
 // Timepicker controller here
 
@@ -281,7 +310,6 @@ $scope.mytime = new Date();
  {
   if(input == null){ return ""; } 
  
-  console.log(frmt)
   if (frmt == 'sdate'){ 
    var _date = $filter('date')(new Date(input), 'MMM dd yyyy');
   }
@@ -954,7 +982,9 @@ $scope.mytime = new Date();
                             'x-access-token': $window.localStorage.getItem('token')
                         }
                     }).success(function(data) {
-                        $scope.getEventList();
+
+                      //  $scope.getEventList();
+                            $location.url('/my_events');
 
                         $scope.submitted = false;
                         delete $scope.formData.text
