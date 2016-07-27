@@ -1118,6 +1118,8 @@ $scope.timers = [];
                //         $rootScope = $rootScope.$new(true);
                         $rootScope.isUserLoggedIn = true;
                        console.log("woeododododo")
+                    $scope.getEvent();
+                       
 /*
                         if (data.user_displayname) {
                             $location.url('/event_list');
