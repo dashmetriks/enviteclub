@@ -6,7 +6,7 @@
     <div  ng-controller="invitesController" ng-init="getEventList()">
                 <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
                   <a href='/event/{{ event._id }}'>
-                  <img src='/uploads/{{ event.event_image}}' height=auto width=100%> </br>
+                  <img src='/uploads/{{ event.event_image}}' height=120px width=240px> </br>
                   </a>
     <div style="padding-left:10px; padding-bottom:10px">
                         <h4><a href='/event/{{ event._id }}'> {{ event.event_title}} </a>  </h4> 
