@@ -85,7 +85,6 @@ exports.join_event = function(req, res){
                 });
             });
       } else {
-
                 Player.update({
                         event_id: req.params.event_id,
                         user_id: req.decoded._doc._id,
@@ -104,6 +103,7 @@ exports.join_event = function(req, res){
                     });
 
       }
+         io.sockets.emit("getinvite", req.params.event_id);
     });
     });
 }
@@ -203,7 +203,6 @@ exports.adduserevent2 = function(req, res){
                 })
             }
             io.sockets.emit("getinvite", req.params.invite_code);
-            console.log("asdf soooooooket")
         } // else   players = null
     });
 }
@@ -238,9 +237,11 @@ console.log(req.decoded._doc)
         },
         function(callback) {
             get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {
+               //     send_email_alert_comment(req.params.event_id, req.params.invite_code, "none", req.body.comment, user.displayname, data)
                 res.json(data);
             })
             callback();
+            io.sockets.emit("getinvite", req.params.invite_code);
         }
     ], function(error) {
         if (error) {

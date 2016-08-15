@@ -426,7 +426,8 @@ $scope.mytime = new Date();
 
         socket.on("getinvite", function(message) {
             console.log("asdfkasdfkaskdfkdsf")
-            $scope.getEventInvite(message);
+          //  $scope.getEventInvite(message);
+            $scope.getEvent(message);
         });
 
         socket.on("mms", function(message) {
