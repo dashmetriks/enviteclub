@@ -51,6 +51,7 @@ function randomValueHex(len) {
 
 
 var apiRoutes = express.Router();
+var stripe = require("stripe")("sk_test_bHQ01Hnro6LK3iNsx0r6JBs2");
 
 // configuration =================
 app.set('superSecret', config.secret);
@@ -102,6 +103,30 @@ apiRoutes.use(function(req, res, next) {
     }
 });
 
+apiRoutes.post('/charge', function(req, res) {
+
+               console.log("weeeeeee")
+	var stripeToken = req.body.stripeToken;
+	var totalcharge = req.body.totalcharge;
+
+	var charge = stripe.charges.create({
+//		amount: 1100, // amount in cents, again
+		amount: totalcharge, // amount in cents, again
+		currency: "usd",
+		card: stripeToken,
+		description: "payinguser@example.com"
+	}, function(err, charge) {
+		if (err && err.type === 'StripeCardError') {
+               console.log("err")
+			// The card has been declined
+		} else {
+               console.log(charge)
+			//Render a thank you page called "Charge"
+//			res.render('charge', { title: 'Charge' });
+		}
+	});
+
+});
 
 app.post('/register', user.register);
 app.post('/authenticate', user.authenticate);

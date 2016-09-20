@@ -122,6 +122,29 @@ angular.module('envite.invite', [
   })
 .controller('ModalInstanceCtrl', function ($scope,$rootScope, $uibModalInstance,FileUploader, items, Upload,$timeout) {
 
+
+var handler = StripeCheckout.configure({
+  key: 'pk_test_auNQCyr5JRirAH46b4E0Gq9V',
+  image: '/img/documentation/checkout/marketplace.png',
+  locale: 'auto',
+  token: function(token) {
+    // You can access the token ID with `token.id`.
+    // Get the token ID to your server-side code for use.
+  }
+});
+
+//$('#customButton').on('click', function(e) {
+$scope.purchase = function() {
+console.log('stripe');
+  // Open Checkout with further options:
+//  handler.open({
+ //   name: 'Demo Site',
+  //  description: '2 widgets',
+   // amount: 2000
+ // });
+//  e.preventDefault();
+};
+
 $scope.uploadPic = function(file) {
     console.log("uploadPic dadsfdsafads")
     file.upload = Upload.upload({
@@ -1088,7 +1111,42 @@ $scope.timers = [];
                     console.log('Error: ' + data);
                 });
         };
+        
+        var handler = StripeCheckout.configure({
+  key: 'pk_test_auNQCyr5JRirAH46b4E0Gq9V',
+  image: '/img/documentation/checkout/marketplace.png',
+  locale: 'auto',
+  token: function(token) {
+    console.log("Got Stripe token: " + token.id);
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/charge/',
+                    data: 'stripeToken=' + token.id + '&totalcharge=500' ,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                    console.log('success: ' + data);
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
 
+    // You can access the token ID with `token.id`.
+    // Get the token ID to your server-side code for use.
+  }
+});
+
+
+        $scope.wtf = function(){
+           console.log("wtf");
+           handler.open({
+    name: 'Demo Site',
+    description: '2 widgets',
+    amount: 2000
+  });
+        };
         $scope.joinEvent = function(ustatus) {
             $http({
                     method: 'get',
