@@ -45,6 +45,10 @@ angular.module('envite.invite', [
             templateUrl: 'invites/csv_sms.html',
             controller: 'invitesController'
         })
+        .when('/d3', {
+            templateUrl: 'invites/beg5.html',
+            controller: 'invitesController'
+        })
 }])
 
     .directive('ngThumb', ['$window', function($window) {

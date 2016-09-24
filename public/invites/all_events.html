@@ -4,7 +4,7 @@
   </p>
 
     <div  ng-controller="invitesController" ng-init="allEvents()">
-                <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
+                <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter:searchFor  | orderBy:'-_id'" class="panel panel-default">
                   <a href='/event/{{ event._id }}'>
                   <img src='/uploads/{{ event.event_image}}' height=120px width=240px> </br>
                   </a>
