@@ -14,7 +14,7 @@
                         Location: {{ event.event_location}}<br>
                         Yeses: {{ events_yes_count[0][event._id] }}<br>
                         Comments: {{ events_comments_count[0][event._id] }} <br>
-<button type="submit" class="btn btn-primary btn-xs" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
+<button type="submit" class="btn btn-primary btn-xs" ng-if="logged_in_userid == event.event_creator" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
            <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
                 </div>
                 </div>

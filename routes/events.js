@@ -225,6 +225,7 @@ exports.my_event_list2 = function(req, res){
                 res.json({
                     'my_events': player_data,
                     'event_yes': [pushY],
+                    'logged_in_userid' : req.decoded._doc._id,
                     'event_invites': [pushList],
                     //  'event_invites': player_data3,
                     'event_no': [pushN],

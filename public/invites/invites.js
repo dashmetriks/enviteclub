@@ -636,6 +636,8 @@ $scope.mytime = new Date();
                     console.log(data['comments_count'])
                     $scope.events = data['my_events'];
                     $scope.events_invite = data['event_invites'][0];
+                    console.log(data['my_events']);
+                    $scope.logged_in_userid = data['logged_in_userid'];
                     $scope.events_yes_count = data['event_yes'];
                     $scope.events_comments_count = data['comments_count'];
                     $rootScope.isUserLoggedIn = true;
