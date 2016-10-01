@@ -1,0 +1,102 @@
+<body>
+    <div class="container" ng-init="checkLogin()">
+        <div ng-if="showLoginToInvite">
+            <div class="container" ng-controller="invitedController">
+                <form class="well">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" ng-model="user.username" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" ng-model="user.password" />
+                    </div>
+                    <input type="button" value="Login" ng-click="login()" class="btn btn-primary" />
+                </form>
+                <h3> {{login_message}} </h3>
+            </div>
+            <h3>or <a href="" ng-click="display_reg_form()">Register</a></h3>
+        </div>
+        <div ng-if="showRegToInvite">
+            <div class="container">
+                <form class="well">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" ng-model="user.username" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" ng-model="user.password" />
+                    </div>
+                    <input type="button" value="Register" ng-click="register()" class="btn btn-primary" />
+                </form>
+                <h3> {{reg_message}} </h3>
+            </div>
+            <h3>or <a href="" ng-click="display_login_form()">Login</a></h3>
+        </div>
+    </div>
+    <div class="container" class="row" ng-show="isEventCreator" ng-init="getEvent()">
+        
+        <div class="col-md-4">
+            <div class="well text-left">
+                <h4>Group Text Name: {{ event_title}}</h4>
+            </div>
+            
+            <div id="todo-list" class="row">
+                <div id="todo-form" class="row">
+                    <div>
+                        <form class="form-inline well" name="myForm">
+                            <div class="form-group">
+                                <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+                                <label>Display Name</label>
+                                <input type="text" name="displayname" class="form-control input-sm text-center" placeholder="name" ng-model="formData.text" required>
+                                <div role="alert">
+                                </div>
+                                <br/>
+                                <label>Phone</label>
+                                <input type="text" name="username" class="form-control input-sm text-center" placeholder="4157771234" ng-model="formData.email" required>
+                                <div role="alert">
+                                    <span class="error" ng-show="myForm.username.$error.required">
+                                </div>
+                                <!--   <button type="submit"  ng-disabled="(myForm.displayname.$pristine && myForm.displayname.$invalid) && (myForm.username.$pristine && myForm.username.$invalid)" class="btn btn-primary btn-sm" ng-click="addInvite()">Invite</button> -->
+                                <button type="submit" ng-disabled="myForm.displayname.$invalid ||  myForm.username.$invalid" class="btn btn-primary btn-sm" ng-click="addPhone()">Add User to Group to be texted</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div>
+                        <form>
+                        <label>Message to be sent</label>
+                                <input type="text"  name="message" class="form-control input-sm text-center" placeholder="message" ng-model="formData.message" required>
+        <div role="alert">
+      <span class="error" ng-show="myForm.message.$error.required">
+        Required!</span>
+    </div>
+
+                         <!--   <button type="submit"  ng-disabled="(myForm.displayname.$pristine && myForm.displayname.$invalid) && (myForm.username.$pristine && myForm.username.$invalid)" class="btn btn-primary btn-sm" ng-click="addInvite()">Invite</button> -->
+
+                            <button type="submit"   class="btn btn-primary btn-sm" ng-click="sendSMS()">Send text</button>
+                        </form>
+                            </div>
+        <div class="col-xs-8" ng-init="getInvites()">
+            <table>
+                <thead>
+                    <tr>
+                        <td>
+                            <h4>Name</h4> </td>
+                        <td>
+                            <h4>Phone</h4> </td>
+                    </tr>
+                </thead>
+                <tr ng-repeat="x in invites">
+                    <td>{{ x.invited}}</td>
+                    <td>{{ x.invited_phone}}</td>
+                </tr>
+            </table>
+        </div>
+        <!-- FORM TO CREATE TODOS -->
+    </div>
+    </div>
+</body>

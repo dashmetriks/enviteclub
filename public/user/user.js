@@ -162,6 +162,7 @@ angular.module('envite.user', ['ngRoute'])
                   }else{
                     if (data['user'][0]['username']) {
                         $scope.username = data['user'][0].username
+                        $scope.phone = data['user'][0].phone
                         if (data['user'][0].displayname) {
                             $scope.displayname = data['user'][0].displayname;
                         } else {
@@ -199,7 +200,7 @@ angular.module('envite.user', ['ngRoute'])
             $http({
                     method: 'POST',
                     url: express_endpoint + '/api/usersave/',
-                    data: 'username=' + $scope.username + '&displayname=' + $scope.displayname,
+                    data: 'username=' + $scope.username + '&displayname=' + $scope.displayname + '&phone=' + $scope.phone ,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'x-access-token': $window.localStorage.getItem('token')

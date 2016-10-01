@@ -147,8 +147,18 @@ exports.authenticate = function(req, res) {
             });
         } else if (user) {
 
+console.log('passss');
+         console.log(req.body.password);
+         console.log(bcrypt.hashSync(req.body.password, salt));
+         console.log(user.password);
+         console.log('dldldl');
+         console.log(bcrypt.compareSync(req.body.password, user.password));
+         console.log('ooooo');
+         
+
             // check if password matches
-            if (user.password != bcrypt.hashSync(req.body.password, salt)) {
+            //if (user.password != bcrypt.hashSync(req.body.password, salt)) {
+            if (!bcrypt.compareSync(req.body.password, user.password)) {  
                 res.json({
                     success: false,
                     message: 'Authentication failed. Wrong password.'
@@ -177,12 +187,14 @@ exports.authenticate = function(req, res) {
 }
 
 exports.usersave = function(req, res) {
+   console.log(req.body.phone);
     User.update({
             _id: req.decoded._doc._id
         }, {
             $set: {
                 username: req.body.username,
-                displayname: req.body.displayname
+                displayname: req.body.displayname,
+                phone: req.body.phone
             }
         },
         function(err, users) {

@@ -1,0 +1,93 @@
+<p>
+    <input type="text" placeholder="Search..." ng-model="searchFor" size="20"/>
+    <button type="button" class="btn btn-default" ng-show="isUserLoggedIn" ng-click="open()">Create New Event</button>  
+  </p>
+
+<div>
+<form class="well" name="form.myForm2">
+                        <input type="text" class="form-control input-md text-center" name="addGroup" placeholder="Create New Text Group" ng-model="formData.text" required>
+                        <input type="button" value="Submit" ng-click="create_new_sms_group()" class="btn btn-primary btn-sm" ng-disabled="form.myForm2.addGroup.$pristine && form.myForm2.addGroup.$invalid">
+                        <input class="btn btn-primary btn-sm" type="button" value="Change Settings" ng-click="invite_change()">
+                    </form>
+</div>
+    <div  ng-controller="invitesController" ng-init="getEventList()">
+                <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
+    <div style="padding-left:10px; padding-bottom:10px">
+                        <h4><a href='/phone_list/{{ event._id }}'> {{ event.event_title}} </a>  </h4> 
+<button type="submit" class="btn btn-primary btn-xs" ng-if="logged_in_userid == event.event_creator" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
+           <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
+                </div>
+                </div>
+
+<div>
+<style type="text/css">
+.modal.fade .modal-dialog {
+    transform: translate(-50%, -80%);
+}
+
+.modal.in .modal-dialog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: 10px;
+}
+
+    </style>
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Create New Text Group</h3>
+        </div>
+        <div class="modal-body">            
+          
+        <div class="well">
+            <form name="eventForm">
+        <div >
+
+
+
+
+
+                <div class="form-group" ng-class="{ 'has-error' : eventForm.event_title.$invalid &&  submitted }">
+                    <label>Event Title</label>
+                    <input type="text" name="event_title" class="form-control input-md text-center" placeholder="Event Title" ng-model="formData.text" required>
+                    <p ng-show="(eventForm.event_title.$invalid && submitted) || noEventTitle" class="help-block">Provide Event Title.</p>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : eventForm.event_location.$invalid &&  submitted }">
+                    <label>Event Location</label>
+                    <input type="text" name="event_location" class="form-control input-md text-center" placeholder="Event Location" ng-model="formData.event_location" required>
+                    <p ng-show="eventForm.event_location.$invalid && submitted" class="help-block">Provide Event Title.</p>
+                </div>
+
+           
+    <fieldset>
+      <br>Photo:
+<label class="btn btn-default btn-file">Browse
+      <input type="file" ngf-select ng-model="picFile" name="file"    
+             accept="image/*" ngf-max-size="2MB" required style="display: none;"
+             ngf-resize="{width: 400, height: 200}"
+             ngf-model-invalid="errorFile">
+</label>
+      <i ng-show="eventForm.file.$error.required">*required</i><br>
+      <i ng-show="eventForm.file.$error.maxSize">File too large 
+          {{errorFile.size / 1000000|number:1}}MB: max 2M</i>
+      <img ng-show="eventForm.file.$valid" ngf-thumbnail="picFile" class="thumb"> <button ng-click="picFile = null" ng-show="picFile">Remove</button>
+      <br>
+      <button ng-disabled="!eventForm.$valid" 
+              ng-click="uploadPic(picFile)">Submit</button>
+      <span class="progress" ng-show="picFile.progress >= 0">
+        <div style="width:{{picFile.progress}}%" 
+            ng-bind="picFile.progress + '%'"></div>
+      </span>
+      <span ng-show="picFile.result">Upload Successful</span>
+      <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
+    </fieldset>
+    <br>
+  </form>
+
+        </div>    
+     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        </div>    
+</script>
+</div>
+

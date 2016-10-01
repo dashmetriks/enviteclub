@@ -55,6 +55,56 @@ exports.invitedlist = function(req, res){
         });
 }
 
+exports.addphone = function(req, res){
+
+    Event.find({
+            _id: req.params.event_id
+        },
+        function(err, events) {
+            if (err)
+                throw err;
+            Invite.create({
+                    event_id: req.params.event_id,
+                    inviter: req.decoded._doc.username,
+                    invited: req.body.text,
+                    twilio_number: '+14152149049',
+                    invited_email: '+1' + req.body.email,
+                    invited_phone: req.body.phone,
+                    invited_type: req.body.type,
+                    invite_code: randomValueHex(8),
+                    invite_status: "Sent"
+                },
+                function(err, new_invite) {
+                    console.log(events[0]["event_title"])
+               //     transporter.sendMail({
+             //           from: config.username,
+              //          to: req.body.email,
+               //         subject: 'You are invited to the event ' + events[0]["event_title"] + ' at ' + events[0]["event_start"],
+                //        html: 'You are invited to the event <a href="' + config.endpoint + '/event/' + req.params.event_id + '">' + events[0]["event_title"] + '</a>' + ' at ' + events[0]["event_start"],
+                 //   });
+                  //  transporter.close();
+                    if (err)
+                        throw err;
+                    Invite.find({
+                            event_id: req.params.event_id
+                        },
+                        null, {
+                            sort: {
+                                "created_at": -1
+                            }
+                        },
+                        function(err, invites) {
+                            if (err)
+                                res.send(err)
+                            res.json({
+                                'invites': invites
+                            });
+                        });
+                }); //d8d88d
+        });
+}
+
+
 exports.addinvite = function(req, res){
 
     Event.find({

@@ -25,12 +25,20 @@ angular.module('envite.invite', [
             templateUrl: 'invites/invited_list2.html',
             controller: 'invitesController'
         })
+        .when('/phone_list/:event_id', {
+            templateUrl: 'invites/phone_list.html',
+            controller: 'invitesController'
+        })
         .when('/rest_queue/:event_id', {
             templateUrl: 'invites/rest_queue.html',
             controller: 'invitesController'
         })
         .when('/my_events', {
             templateUrl: 'invites/event_list.html',
+            controller: 'invitesController'
+        })
+        .when('/my_group_sms', {
+            templateUrl: 'invites/sms_group_list.html',
             controller: 'invitesController'
         })
         .when('/all_events', {
@@ -819,6 +827,7 @@ $scope.mytime = new Date();
                     $scope.event_data = data['event'][0];
                     $scope.event_creator_id = data['event'][0].event_creator;
                     $scope.event_id = data['event'][0]._id;
+                    $scope.event_title = data['event'][0].event_title;
                     $scope.yeses = data['players_yes'];
                     $scope.nos = data['players_no'];
                     $scope.date_now = data['date_now'];
@@ -992,6 +1001,38 @@ $scope.mytime = new Date();
         };
 
 
+        $scope.create_new_sms_group = function() {
+        // $scope.uploader.queue.upload() 
+         console.log("saddddd")
+         
+            $scope.submitted = true;
+            //if ($scope.formData.text.length < 1) {
+            if ($scope.formData.text < 1) {
+                $scope.noEventTitle = true;
+            } else {
+                $http({
+                        method: 'POST',
+                        url: express_endpoint + '/api/new_event',
+                        data: 'text=' + $scope.formData.text ,
+
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'x-access-token': $window.localStorage.getItem('token')
+                        }
+                    }).success(function(data) {
+
+                      //  $scope.getEventList();
+                            $location.url('/my_group_sms');
+
+                        $scope.submitted = false;
+                        delete $scope.formData.text
+                        delete $scope.formData.event_location
+                    })
+                    .error(function(data) {
+                        console.log('Error: ' + data);
+                    });
+            }
+        };
         $rootScope.createEvent = function(ffile,title,event_location,event_date,event_time) {
         console.log(ffile)
         // $scope.uploader.queue.upload() 
@@ -1118,6 +1159,25 @@ $scope.timers = [];
                 });
         };
         
+        $scope.addPhone = function() {
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/addphone/' + $routeParams.event_id,
+                    data: 'text=' + $scope.formData.text + '&phone=' + $scope.formData.email,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                    delete $scope.formData.text
+                    delete $scope.formData.email
+                    $scope.getInvites();
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
+
         var handler = StripeCheckout.configure({
   key: 'pk_test_auNQCyr5JRirAH46b4E0Gq9V',
   image: '/img/documentation/checkout/marketplace.png',

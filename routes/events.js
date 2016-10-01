@@ -45,6 +45,8 @@ exports.new_event = function(req, res){
                     inviter: user.username,
                     invited: user.displayname,
                     invited_email: user.username,
+                    twilio_number: '+14152149049',
+                    invited_phone: user.phone,
                     //     invited_email: req.body.email,
                     //    invited_phone: req.body.phone,
                     //     invited_type: req.body.type,

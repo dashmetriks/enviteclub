@@ -8,6 +8,7 @@ module.exports = mongoose.model('Invite', new Schema({
     invited: String,
     invited_email: String,
     invited_phone: String,
+    twilio_number: String,
     invited_type: String,
     invited_username: String,
     twilio_media: String,
