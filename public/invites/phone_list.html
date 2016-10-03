@@ -80,8 +80,8 @@
                             <button type="submit"   class="btn btn-primary btn-sm" ng-click="sendSMS()">Send text</button>
                         </form>
                             </div>
-        <div class="col-xs-8" ng-init="getInvites()">
-            <table>
+        <div class="col-md-6" ng-init="getInvites()">
+            <table class="table table-bordered table-striped table-hover">
                 <thead>
                     <tr>
                         <td>
@@ -93,6 +93,9 @@
                 <tr ng-repeat="x in invites">
                     <td>{{ x.invited}}</td>
                     <td>{{ x.invited_phone}}</td>
+                    <td>
+<button type="submit" class="btn btn-primary btn-xs" ng-click="delete_sms_user_confirm(x._id)">Delete User</button>
+           <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == x._id" ng-click="delete_sms_user(x._id)">Confirm Delete</button></td>
                 </tr>
             </table>
         </div>

@@ -578,9 +578,16 @@ $scope.mytime = new Date();
                 $scope.showDeleteEvent = true;
             }
             $scope.showDeleteEventid = id;
-
         };
 
+        $scope.delete_sms_user_confirm = function(id) {
+            if ($scope.showDeleteEvent == true) {
+                $scope.showDeleteEvent = false;
+            } else {
+                $scope.showDeleteEvent = true;
+            }
+            $scope.showDeleteEventid = id;
+        };
 
         $scope.deleteEvent = function(id) {
             $http({
@@ -599,6 +606,22 @@ $scope.mytime = new Date();
                 });
         };
 
+        $scope.delete_sms_user = function(id) {
+            $http({
+                    method: 'DELETE',
+                    url: express_endpoint + '/api/deleteinvite/' + id,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                    $scope.getInvites();
+                    $scope.showDeleteEvent = false;
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
 
         $scope.checkLogin = function() {
             $http({

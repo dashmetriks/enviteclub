@@ -162,6 +162,7 @@ app.get('/invites/:invite_code', invitepage.getinvite);
 apiRoutes.get('/invited/:event_id', invites.invitedlist);
 
 apiRoutes.post('/addinvite/:event_id/', invites.addinvite); 
+apiRoutes.delete('/deleteinvite/:invite_id', invites.deleteinvite);
 apiRoutes.post('/addphone/:event_id/', invites.addphone); 
 apiRoutes.post('/sendsms/:event_id/', sms.sendsms);
 app.get('/smsdata', sms.smsdata);

@@ -153,6 +153,15 @@ exports.addinvite = function(req, res){
         });
 }
 
+exports.deleteinvite = function(req, res){
+    Invite.remove({
+        _id: req.params.invite_id
+    }, function(err, invites) {
+        if (err) res.send(err);
+            res.json(invites);
+    });
+}
+
 exports.join_event = function(req, res){
 console.log('made it');
 
