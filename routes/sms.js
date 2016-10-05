@@ -2,6 +2,7 @@ var Invite = require('../app/models/invites');
 var User = require('../app/models/user');
 var Baby = require('babyparse');
 var Event = require('../app/models/events');
+var Comments = require('../app/models/comments');
 var crypto = require('crypto');
 var config = require('../config');
 var client = require('twilio')(config.twilio_sid, config.twilio_token);
@@ -79,7 +80,7 @@ User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
                         },
                         function(err, invites) {
                             if (err) res.send(err)
-                           // console.log(invites);
+                            console.log(invites);
                            //  
                            invites.forEach(function(doc) {
                            //console.log(doc.name + " is a " + doc.category_code + " company.");
@@ -97,6 +98,15 @@ User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
                     res.end('Done')
                     console.log(err)
                         if (!err) { // "err" is an error received during the request, if any
+                      Comments.create({
+                        event_id: req.params.event_id,
+                        displayname: user.displayname, 
+                        text: req.body.message
+                    },
+                    function(err, result) {
+                        if (err)
+                            throw err;
+                    });
 
                         }
                     });

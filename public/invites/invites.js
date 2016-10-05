@@ -29,6 +29,10 @@ angular.module('envite.invite', [
             templateUrl: 'invites/phone_list.html',
             controller: 'invitesController'
         })
+        .when('/sms_group/:event_id', {
+            templateUrl: 'invites/sms_group.html',
+            controller: 'invitesController'
+        })
         .when('/rest_queue/:event_id', {
             templateUrl: 'invites/rest_queue.html',
             controller: 'invitesController'
@@ -985,7 +989,7 @@ $scope.mytime = new Date();
                     $scope.changeSettingsAnon = false;
                     $scope.changeSettings = false;
                     $scope.newInvite = false;
-                    $scope.getEvent();
+                   // $scope.getEvent();
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
@@ -1147,16 +1151,19 @@ $scope.timers = [];
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
-                    $scope.invite_code1 = data["invites"][0]["invite_code"]
+                    //$scope.invite_code1 = data["invites"][0]["invite_code"]
                   //  $scope.timers = []; 
                  //   $scope.timers.push({strtime: 1000, name : data["invites"][0]["invite_code"], date1: data["invites"][0]["created_at"]});
-                    $scope.counter2++;
+                    //$scope.counter2++;
                   //  $scope.strtime = 1500;
                     //$scope.invited_phone = data["invites"][0]["invited_phone"]
-                    delete $scope.formData.text
-                    delete $scope.formData.email
-                    $scope.getInvites();
-                    console.log($scope.timers[0]);
+                   // delete $scope.formData.text
+                    console.log('come on');
+                    delete $scope.formData.message
+                    $scope.getEvent();
+//                    $scope.getInvites();
+
+ //                   console.log($scope.timers[0]);
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
