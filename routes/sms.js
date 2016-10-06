@@ -167,7 +167,7 @@ exports.smsdata = function(req, res){
                             sort: { "created_at": -1 }
                         },
                         function(err, invites) {
-                            if (err) res.send(err)
+                             if (err) res.send(err)
                           Invite.findOne({
                             twilio_number: req.query.To, 
                             invited_phone: FromNumber 
@@ -175,28 +175,30 @@ exports.smsdata = function(req, res){
                         function(err, sms_sender) {
                             if (err)
                                 res.send(err)
-                        //   console.log(sms_sender)
+                      Comments.create({
+                        event_id: sms_sender.event_id,
+                        displayname: sms_sender.invited, 
+                        text: req.query.Body 
+                    },
+                    function(err, result) {
+                        if (err) throw err;
+                    });
                         invites.forEach(function(doc) {
                           if (doc.invited_phone){ 
                            console.log(doc.invited_phone)
-                          
                     client.sendMessage({
-                        //to: '+1' + req.query.From, 
                         to: '+1' + doc.invited_phone, 
                         from: req.query.To, 
-                        //body: req.body.text
                         body: sms_sender.invited + ' says: ' + req.query.Body
 
                     }, function(err, responseData) { 
                     res.end('Done')
-                    console.log(err)
                         if (!err) { 
-
                         }
                     });
                           }
                         });
-
+                    io.sockets.emit("mms", sms_sender.event_id);
                     });
                     });
 
