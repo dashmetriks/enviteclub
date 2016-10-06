@@ -13,7 +13,7 @@ function randomValueHex(len) {
         .slice(0, len); // return required number of characters
 }
 
-exports.sendsms_invite = function(req, res){
+exports.sendsms_invite = function(req, res) {
 
     Event.find({
             _id: req.params.event_id
@@ -42,8 +42,8 @@ exports.sendsms_invite = function(req, res){
                         body: req.body.message
 
                     }, function(err, responseData) { //this function is executed when a response is received from Twilio
-                   
-                    console.log(err)
+
+                        console.log(err)
                         if (!err) { // "err" is an error received during the request, if any
 
                         }
@@ -51,7 +51,7 @@ exports.sendsms_invite = function(req, res){
                     if (err)
                         throw err;
                     Invite.find({
-                            invite_code:  new_invite.invite_code
+                            invite_code: new_invite.invite_code
                         },
                         null, {
                             sort: {
@@ -69,150 +69,159 @@ exports.sendsms_invite = function(req, res){
         });
 }
 
-exports.sendsms = function(req, res){
+exports.sendsms = function(req, res) {
 
-User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+    User.findOne({
+        _id: req.decoded._doc._id
+    }, function(err, user) {
         if (err) throw err;
 
-    Invite.find({ event_id: req.params.event_id },
-                        null, {
-                            sort: { "created_at": -1 }
-                        },
-                        function(err, invites) {
-                            if (err) res.send(err)
-                            console.log(invites);
-                           //  
-                           invites.forEach(function(doc) {
-                           //console.log(doc.name + " is a " + doc.category_code + " company.");
-                           if (doc.invited_email != "jdjdj@222.com") {
-                             console.log(doc.invited_phone)
-                             console.log(user.displayname)
-                    client.sendMessage({
+        Invite.find({
+                event_id: req.params.event_id
+            },
+            null, {
+                sort: {
+                    "created_at": -1
+                }
+            },
+            function(err, invites) {
+                if (err) res.send(err)
+                console.log(invites);
+                //  
+                invites.forEach(function(doc) {
+                    //console.log(doc.name + " is a " + doc.category_code + " company.");
+                    if (doc.invited_email != "jdjdj@222.com") {
+                        console.log(doc.invited_phone)
+                        console.log(user.displayname)
+                        client.sendMessage({
 
-                        to:  '+1' + doc.invited_phone, // Any number Twilio can deliver to
-                        from: '+14152149049', // A number you bought from Twilio and can use for outbound communication
-                        //body: req.body.sms_type // body of the SMS message
-                        body: user.displayname +  ' says: ' + req.body.message
+                            to: '+1' + doc.invited_phone, // Any number Twilio can deliver to
+                            from: '+14152149049', // A number you bought from Twilio and can use for outbound communication
+                            //body: req.body.sms_type // body of the SMS message
+                            body: user.displayname + ' says: ' + req.body.message
 
-                    }, function(err, responseData) { //this function is executed when a response is received from Twilio
-                    res.end('Done')
-                    console.log(err)
-                        if (!err) { // "err" is an error received during the request, if any
-                      Comments.create({
-                        event_id: req.params.event_id,
-                        displayname: user.displayname, 
-                        text: req.body.message
-                    },
-                    function(err, result) {
-                        if (err)
-                            throw err;
-                    });
+                        }, function(err, responseData) { //this function is executed when a response is received from Twilio
+                            res.end('Done')
+                            console.log(err)
+                            if (!err) { // "err" is an error received during the request, if any
+                                Comments.create({
+                                        event_id: req.params.event_id,
+                                        displayname: user.displayname,
+                                        text: req.body.message
+                                    },
+                                    function(err, result) {
+                                        if (err)
+                                            throw err;
+                                    });
 
-                        }
-                    });
-                           }
-                        //    res.json({ 'invites': invites });
-                           });
-                    });
-                    });
-}
-
-exports.csv_upload = function(req, res){
-console.log(req.files)
-   var file = req.files.file;
-   fs = require('fs')
-   fs.readFile(file.path, function (err, data) {
-    if (err) throw err;
-    file_name_loc = './uploads/test1.csv';
-    fs.writeFile(file_name_loc, data, function (err) {
-        if (err) throw err;
-        console.log('It\'s saved!');
-        parsed = Baby.parseFiles(file_name_loc);
-        rows = parsed.data;
-        console.log(rows)
-        res.json(rows);
-    });
-});
-}
-
-exports.sendcsvsms = function(req, res){
-
-console.log(req.body.phone_number)
-                    client.sendMessage({
-                        to: req.body.phone_number, // Any number Twilio can deliver to
-                        from: '+14152149049', // A number you bought from Twilio and can use for outbound commu
-                        body: req.body.text
-
-                    }, function(err, responseData) { //this function is executed when a response is received from Twilio
-                    res.end('Done')
-
-                    console.log(responseData)
-                    console.log(err)
-                        if (!err) { // "err" is an error received during the request, if any
-
-                        }
-                    });
-}
-
-
-exports.smsdata = function(req, res){
-
-                         console.log(req.query.To);
-                         console.log(req.query.To.replace('+1', ''));
-                      //   console.log(req.query.From);
-                        var FromNumber = req.query.From.replace('+1', '') 
-
-    Invite.find({ twilio_number: req.query.To },
-                        null, {
-                            sort: { "created_at": -1 }
-                        },
-                        function(err, invites) {
-                             if (err) res.send(err)
-                          Invite.findOne({
-                            twilio_number: req.query.To, 
-                            invited_phone: FromNumber 
-                        },
-                        function(err, sms_sender) {
-                            if (err)
-                                res.send(err)
-                      Comments.create({
-                        event_id: sms_sender.event_id,
-                        displayname: sms_sender.invited, 
-                        text: req.query.Body 
-                    },
-                    function(err, result) {
-                        if (err) throw err;
-                    });
-                        invites.forEach(function(doc) {
-                          if (doc.invited_phone){ 
-                           console.log(doc.invited_phone)
-                    client.sendMessage({
-                        to: '+1' + doc.invited_phone, 
-                        from: req.query.To, 
-                        body: sms_sender.invited + ' says: ' + req.query.Body
-
-                    }, function(err, responseData) { 
-                    res.end('Done')
-                        if (!err) { 
-                        }
-                    });
-                          }
+                            }
                         });
-                    io.sockets.emit("mms", sms_sender.event_id);
-                    });
-                    });
+                    }
+                    //    res.json({ 'invites': invites });
+                });
+            });
+    });
+}
 
-
-/*
-    Invite.create({
-            event_id: req.params.event_id,
-            invited_email: req.query.From,
-            invite_status: req.query.MediaUrl0
-        },
-        function(err, result) {
-            if (err)
-                throw err;
+exports.csv_upload = function(req, res) {
+    console.log(req.files)
+    var file = req.files.file;
+    fs = require('fs')
+    fs.readFile(file.path, function(err, data) {
+        if (err) throw err;
+        file_name_loc = './uploads/test1.csv';
+        fs.writeFile(file_name_loc, data, function(err) {
+            if (err) throw err;
+            console.log('It\'s saved!');
+            parsed = Baby.parseFiles(file_name_loc);
+            rows = parsed.data;
+            console.log(rows)
+            res.json(rows);
         });
-    io.sockets.emit("mms", req.params.event_id);
-*/
+    });
+}
+
+exports.sendcsvsms = function(req, res) {
+
+    console.log(req.body.phone_number)
+    client.sendMessage({
+        to: req.body.phone_number, // Any number Twilio can deliver to
+        from: '+14152149049', // A number you bought from Twilio and can use for outbound commu
+        body: req.body.text
+
+    }, function(err, responseData) { //this function is executed when a response is received from Twilio
+        res.end('Done')
+
+        console.log(responseData)
+        console.log(err)
+        if (!err) { // "err" is an error received during the request, if any
+
+        }
+    });
+}
+
+
+exports.smsdata = function(req, res) {
+
+    console.log(req.query.To);
+    console.log(req.query.To.replace('+1', ''));
+    //   console.log(req.query.From);
+    var FromNumber = req.query.From.replace('+1', '')
+
+    Invite.find({
+            twilio_number: req.query.To
+        },
+        null, {
+            sort: {
+                "created_at": -1
+            }
+        },
+        function(err, invites) {
+            if (err) res.send(err)
+            Invite.findOne({
+                    twilio_number: req.query.To,
+                    invited_phone: FromNumber
+                },
+                function(err, sms_sender) {
+                    if (err)
+                        res.send(err)
+                    Comments.create({
+                            event_id: sms_sender.event_id,
+                            displayname: sms_sender.invited,
+                            text: req.query.Body
+                        },
+                        function(err, result) {
+                            if (err) throw err;
+                        });
+                    invites.forEach(function(doc) {
+                        if (doc.invited_phone) {
+                            console.log(doc.invited_phone)
+                            client.sendMessage({
+                                to: '+1' + doc.invited_phone,
+                                from: req.query.To,
+                                body: sms_sender.invited + ' says: ' + req.query.Body
+
+                            }, function(err, responseData) {
+                                res.end('Done')
+                                if (!err) {}
+                            });
+                        }
+                    });
+                    io.sockets.emit("mms", sms_sender.event_id);
+                });
+        });
+
+
+    /*
+        Invite.create({
+                event_id: req.params.event_id,
+                invited_email: req.query.From,
+                invite_status: req.query.MediaUrl0
+            },
+            function(err, result) {
+                if (err)
+                    throw err;
+            });
+        io.sockets.emit("mms", req.params.event_id);
+    */
 }
