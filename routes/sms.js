@@ -75,19 +75,19 @@ exports.sendsms = function(req, res) {
         _id: req.decoded._doc._id
     }, function(err, user) {
         if (err) throw err;
-                                Comments.create({
-                                        event_id: req.params.event_id,
-                                        displayname: user.displayname,
-                                        text: req.body.message
-                                    },
-                                    function(err, result) {
-                                        if (err)
-                                            throw err;
-                                    });
+        Comments.create({
+                event_id: req.params.event_id,
+                displayname: user.displayname,
+                text: req.body.message
+            },
+            function(err, result) {
+                if (err)
+                    throw err;
+            });
 
         Invite.find({
                 event_id: req.params.event_id,
-                invite_status: "Sent" 
+                invite_status: "Sent"
             },
             null, {
                 sort: {
@@ -108,7 +108,7 @@ exports.sendsms = function(req, res) {
                             to: '+1' + doc.invited_phone, // Any number Twilio can deliver to
                             //from: '+14152149049', // A number you bought from Twilio and can use for outbound communication
                             //from: '+15102294542', // A number you bought from Twilio and can use for outbound communication
-                            from: doc.twilio_number, 
+                            from: doc.twilio_number,
                             //body: req.body.sms_type // body of the SMS message
                             body: user.displayname + ' says: ' + req.body.message
 
@@ -168,13 +168,13 @@ exports.smsdata = function(req, res) {
 
     console.log(req.query.To);
     console.log("asdfasdfadsf");
-   // console.log(req.query.To.replace('+1', ''));
+    // console.log(req.query.To.replace('+1', ''));
     //   console.log(req.query.From);
     var FromNumber = req.query.From.replace('+1', '')
 
     Invite.find({
             twilio_number: req.query.To,
-            invite_status: "Sent" 
+            invite_status: "Sent"
         },
         null, {
             sort: {
@@ -189,28 +189,28 @@ exports.smsdata = function(req, res) {
                 },
                 function(err, sms_sender) {
                     if (err) res.send(err)
-                    if (sms_sender){
-                       console.log(req.query.Body)
+                    if (sms_sender) {
+                        console.log(req.query.Body)
                     }
-                    if (req.query.Body.toLowerCase() == "getout"){
-                       console.log("getttttttt   out")
-                       console.log(FromNumber)
-                          
-                       Invite.update({
-                          invited_phone: FromNumber,
-                          event_id: sms_sender.event_id,
-                         //_id: invite_id
-                       }, {
-                          $set: {
-                              invite_status: "Opted Out",
-                          }
-                      },
-                      function(err, result) {
-                          if (err)
-                              throw err;
-                        console.log("opppppppt")
-                        console.log(result); 
-                      });
+                    if (req.query.Body.toLowerCase() == "getout") {
+                        console.log("getttttttt   out")
+                        console.log(FromNumber)
+
+                        Invite.update({
+                                invited_phone: FromNumber,
+                                event_id: sms_sender.event_id,
+                                //_id: invite_id
+                            }, {
+                                $set: {
+                                    invite_status: "Opted Out",
+                                }
+                            },
+                            function(err, result) {
+                                if (err)
+                                    throw err;
+                                console.log("opppppppt")
+                                console.log(result);
+                            });
                     }
                     //io.sockets.emit("mms", sms_sender.event_id);
                     Comments.create({

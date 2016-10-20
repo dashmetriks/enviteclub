@@ -18,7 +18,7 @@ function randomValueHex(len) {
         .slice(0, len); // return required number of characters
 }
 
-exports.invitedlist = function(req, res){
+exports.invitedlist = function(req, res) {
     Invite.find({
             event_id: req.params.event_id
         },
@@ -55,7 +55,7 @@ exports.invitedlist = function(req, res){
         });
 }
 
-exports.addphone = function(req, res){
+exports.addphone = function(req, res) {
 
     Event.find({
             _id: req.params.event_id
@@ -77,13 +77,13 @@ exports.addphone = function(req, res){
                 },
                 function(err, new_invite) {
                     console.log(events[0]["event_title"])
-               //     transporter.sendMail({
-             //           from: config.username,
-              //          to: req.body.email,
-               //         subject: 'You are invited to the event ' + events[0]["event_title"] + ' at ' + events[0]["event_start"],
-                //        html: 'You are invited to the event <a href="' + config.endpoint + '/event/' + req.params.event_id + '">' + events[0]["event_title"] + '</a>' + ' at ' + events[0]["event_start"],
-                 //   });
-                  //  transporter.close();
+                        //     transporter.sendMail({
+                        //           from: config.username,
+                        //          to: req.body.email,
+                        //         subject: 'You are invited to the event ' + events[0]["event_title"] + ' at ' + events[0]["event_start"],
+                        //        html: 'You are invited to the event <a href="' + config.endpoint + '/event/' + req.params.event_id + '">' + events[0]["event_title"] + '</a>' + ' at ' + events[0]["event_start"],
+                        //   });
+                        //  transporter.close();
                     if (err)
                         throw err;
                     Invite.find({
@@ -106,7 +106,7 @@ exports.addphone = function(req, res){
 }
 
 
-exports.addinvite = function(req, res){
+exports.addinvite = function(req, res) {
 
     Event.find({
             _id: req.params.event_id
@@ -154,17 +154,17 @@ exports.addinvite = function(req, res){
         });
 }
 
-exports.deleteinvite = function(req, res){
+exports.deleteinvite = function(req, res) {
     Invite.remove({
         _id: req.params.invite_id
     }, function(err, invites) {
         if (err) res.send(err);
-            res.json(invites);
+        res.json(invites);
     });
 }
 
-exports.join_event = function(req, res){
-console.log('made it');
+exports.join_event = function(req, res) {
+    console.log('made it');
 
     Event.find({
             _id: req.params.event_id
@@ -175,25 +175,25 @@ console.log('made it');
             Invite.create({
                     event_id: req.params.event_id,
                     //inviter: req.decoded._doc.username,
-                  //  invited: req.body.text,
-                  //  invited_email: req.body.email,
-                 //   invited_phone: req.body.phone,
-                 //   invited_type: req.body.type,
+                    //  invited: req.body.text,
+                    //  invited_email: req.body.email,
+                    //   invited_phone: req.body.phone,
+                    //   invited_type: req.body.type,
                     invite_code: randomValueHex(8),
                     invite_status: "Yes"
                 },
                 function(err, new_invite) {
 
                     console.log(events[0]["event_title"])
-/*
-                    transporter.sendMail({
-                        from: config.username,
-                        to: req.body.email,
-                        subject: 'You are invited to the event ' + events[0]["event_title"] + ' at ' + events[0]["event_start"],
-                        html: 'You are invited to the event <a href="' + config.endpoint + '/invite/' + new_invite.invite_code + '">' + events[0]["event_title"] + '</a>' + ' at ' + events[0]["event_start"],
-                    });
-                    transporter.close();
-*/
+                        /*
+                                            transporter.sendMail({
+                                                from: config.username,
+                                                to: req.body.email,
+                                                subject: 'You are invited to the event ' + events[0]["event_title"] + ' at ' + events[0]["event_start"],
+                                                html: 'You are invited to the event <a href="' + config.endpoint + '/invite/' + new_invite.invite_code + '">' + events[0]["event_title"] + '</a>' + ' at ' + events[0]["event_start"],
+                                            });
+                                            transporter.close();
+                        */
                     if (err)
                         throw err;
                     Invite.find({
