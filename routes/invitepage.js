@@ -5,6 +5,7 @@ var User = require('../app/models/user');
 var Invite = require('../app/models/invites');
 var Event = require('../app/models/events');
 var Player = require('../app/models/players');
+var Twilio = require('../app/models/twilio');
 var Comments = require('../app/models/comments');
 var crypto = require('crypto');
 var app = express(); // create our app w/ express
@@ -292,6 +293,21 @@ console.log("exports.geteventanon ")
 
 exports.getevent = function(req, res){
 console.log("exports.getevent")
+Twilio.find( function(err, events) {
+                if (err) res.send(err)
+               console.log(events);
+            });
+
+
+//Twilio.create({ "twilio_number" : "+14152149049" , "number_status" : "free" } ,
+ //                           function(err, result) {
+  //                              if (err)
+   //                                 throw err;
+    //                         console.log(result)
+     //                       });
+
+
+console.log("8888orts.getevent")
    // get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {
     get_event_data(req.params.event_id, req.decoded._doc._id, function(data) {
         console.log(req.params.event_id)

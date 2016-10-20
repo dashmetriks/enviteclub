@@ -4,6 +4,7 @@ var Invite = require('../app/models/invites');
 var Event = require('../app/models/events');
 var Player = require('../app/models/players');
 var Comments = require('../app/models/comments');
+var Twilio = require('../app/models/twilio');
 var async = require("async");
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
@@ -21,13 +22,18 @@ function randomValueHex(len) {
 }
 
 exports.new_event = function(req, res){
+ 
     User.findOne({
         _id: req.decoded._doc._id
     }, function(err, user) {
 
         if (err)
             throw err;
- console.log(req.body.event_time)
+         Twilio.findOne({ "number_status" : "free" } ,
+              function(err, twilio) {
+                if (err) res.send(err)
+               console.log(twilio);
+
         Event.create({
             event_title: req.body.text,
             event_start: req.body.event_start,
@@ -35,24 +41,45 @@ exports.new_event = function(req, res){
             event_location: req.body.event_location,
             event_creator: req.decoded._doc._id,
             event_image: req.body.image,
+            //event_twilio_number: '+15102294542',
+            event_twilio_number: twilio.twilio_number ,
             event_creator_displayname: user.displayname
 
         }, function(err, event_created) {
             if (err)
                 res.send(err);
+
+Twilio.update({
+            twilio_number: twilio.twilio_number
+        }, {
+            $set: {
+                number_status: "used"
+            }
+        },
+        function(err, result) {
+            if (err)
+                throw err;
+            console.log(result)
+        });
+
+
+
+
+
             Invite.create({
                     event_id: event_created._id,
                     inviter: user.username,
                     invited: user.displayname,
                     invited_email: user.username,
-                    twilio_number: '+14152149049',
+                  //  twilio_number: '+14152149049',
+                    twilio_number: twilio.twilio_number, 
                     invited_phone: user.phone,
                     //     invited_email: req.body.email,
                     //    invited_phone: req.body.phone,
                     //     invited_type: req.body.type,
                     invite_code: randomValueHex(8),
                     event_creator: "Yes",
-                    invite_status: "Yes"
+                    invite_status: "Sent"
                 },
                 function(err, new_invite) {
                     Player.create({
@@ -86,6 +113,7 @@ exports.new_event = function(req, res){
             });
         });
     });
+  });
 }
 
 exports.image_upload = function(req, res){
@@ -120,6 +148,26 @@ fs.readFile(file.path, function (err, data) {
 
 
 exports.delete_event = function(req, res){
+    Event.findOne({
+        _id: req.params.event_id
+                  },
+                    function(err, events2) {
+                        if (err)
+                            res.send(err)
+    Twilio.update({
+          twilio_number: events2.event_twilio_number
+        }, {
+            $set: {
+                number_status: "free"
+            }
+        },
+        function(err, result) {
+            if (err)
+                throw err;
+            console.log(result)
+        });
+     });
+
     Event.remove({
         _id: req.params.event_id
     }, function(err, events) {
@@ -128,7 +176,13 @@ exports.delete_event = function(req, res){
             event_id: req.params.event_id
         }, function(err, players) {
             if (err) res.send(err);
-            res.json(events);
+            //res.json(events);
+        });
+        Invite.remove({
+            event_id: req.params.event_id
+        }, function(err, invites) {
+            if (err) res.send(err);
+            res.json(invites);
         });
     });
 }

@@ -51,6 +51,7 @@
                     <h4> Date: {{ event_data.event_start | date1:'sdate' }} {{ event_data.event_time | date1:'stime' }} </h4>
                     <h4>Location: {{event_data.event_location}} </h4>
                     <h4>Host: {{event_data.event_creator_displayname}} </h4>
+                    <h4>SMS number: {{event_data.event_twilio_number}} </h4>
                     <label ng-if="isUserLoggedIn">
                         <div ng-repeat="user in players_list">
                             <span ng-if="invite_code == user.invite_code && event_creator_id == user.user_id">
@@ -121,15 +122,15 @@
             <table class="table table-bordered table-striped table-hover">
                 <thead>
                     <tr>
-                        <td>
-                            <h4>Name</h4> </td>
-                        <td>
-                            <h4>Phone</h4> </td>
+                        <td> <h4>Name</h4> </td>
+                        <td> <h4>Phone</h4> </td>
+                        <td> <h4>Status</h4> </td>
                     </tr>
                 </thead>
                 <tr ng-repeat="x in invites">
                     <td>{{ x.invited}}</td>
                     <td>{{ x.invited_phone}}</td>
+                    <td>{{ x.invite_status}}</td>
                     <td>
 <button type="submit" class="btn btn-primary btn-xs" ng-click="delete_sms_user_confirm(x._id)">Delete User</button>
            <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == x._id" ng-click="delete_sms_user(x._id)">Confirm Delete</button></td>

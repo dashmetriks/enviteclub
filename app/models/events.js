@@ -12,6 +12,7 @@ module.exports = mongoose.model('Event', new Schema({
     event_start: String,
     event_time: String,
     event_location: String,
+    event_twilio_number: String,
     event_end: String,
     created_at: {
         type: Date,
