@@ -5,6 +5,7 @@ var express = require('express');
 var app = express(); // create our app w/ express
 var config = require('../config');
 var bcrypt = require('bcrypt');
+var client = require('twilio')(config.twilio_sid, config.twilio_token);
 
 var crypto = require('crypto');
 var salt = bcrypt.genSaltSync(10);
@@ -35,11 +36,28 @@ exports.register = function(req, res) {
         if (!user) {
             var newuser = new User({
                 username: req.body.name,
+                phone: req.body.phone,
+                confirm_phone_code: randomValueHex(4),
                 password: bcrypt.hashSync(req.body.password, salt)
             });
-            newuser.save(function(err) {
+            newuser.save(function(err, new_user) {
                 if (err)
                     throw err;
+                
+                    client.sendMessage({
+
+                        to: '+1' + req.body.phone, // Any number Twilio can deliver to
+                        from: '+14152149049', // A number you bought from Twilio and can use for outbound communication
+                        //body: req.body.sms_type // body of the SMS message
+                        body: "Please enter code " + new_user.confirm_phone_code + " to confirm this number"
+
+                    }, function(err, responseData) { //this function is executed when a response is received from Twilio
+
+                        console.log(err)
+                        if (!err) { // "err" is an error received during the request, if any
+
+                        }
+                    });
 
                 res.json({
                     success: true
@@ -177,6 +195,7 @@ console.log('passss');
                     success: true,
                     message: 'Enjoy your token!',
                     user_displayname: user.displayname,
+                    phone_confirmed: user.phone_confirmed,
                     token: token
                 });
             }
@@ -286,6 +305,64 @@ exports.resetpassword = function(req, res) {
             });
     */
 }
+
+exports.confirmphone = function(req, res) {
+    User.find({
+            _id: req.decoded._doc._id
+        },
+        function(err, users) {
+            if (err) res.send(err)
+        if (req.body.confirmphone == users[0].confirm_phone_code ){
+            console.log('ooooooo yeah baby')
+            User.update({
+                    _id: req.decoded._doc._id
+                }, {
+                    $set: {
+                        phone_confirmed: "true" 
+                    }
+                },
+                function(err, usersconfirm) {
+                    if (err)
+                        throw err;
+                        res.json({
+                            success: true,
+                            message: 'Phone has been confirmed. Thanks!'
+                        });
+                    //res.json({
+                  //      'user': usersconfirm,
+                   // });
+            });
+        }else{
+                        res.json({
+                            success: true,
+                            message: 'Sorry. Wrong code. Try Again'
+                        });
+
+        }
+
+            //res.json({
+           //     'user': users,
+            //});
+        });
+/*
+    User.update({
+            _id: req.decoded._doc._id
+        }, {
+            $set: {
+                password: bcrypt.hashSync(req.body.password, salt)
+            }
+        },
+        function(err, users) {
+            if (err)
+                throw err;
+            //res.json(result);
+            res.json({
+                'user': users,
+            });
+        });
+*/
+}
+
 exports.passwordsave = function(req, res) {
     User.update({
             _id: req.decoded._doc._id

@@ -54,6 +54,9 @@ angular.module('envite.user', ['ngRoute'])
             $scope.changePassword = $scope.changePassword === true ? false : true;
         }
 
+        $scope.phone_confirm = function() {
+            $scope.confirmPhone = $scope.confirmPhone === true ? false : true;
+        }
 
         $scope.reset_password = function() {
             $scope.submitted = true;
@@ -80,6 +83,31 @@ angular.module('envite.user', ['ngRoute'])
             }
         }
 
+        $scope.save_phone_confirmation = function() {
+            $scope.submitted = true;
+            if ($scope.fields.confirmphone.length < 1) {
+                $scope.noPassword = true;
+            } else {
+                $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/confirmphone',
+                    data: '&confirmphone=' + $scope.fields.confirmphone,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                    $scope.confirmPhone = $scope.confirmPhone === true ? false : true;
+                    $rootScope.reg_message_success = data.message 
+                   // $rootScope.reg_message_success = "Phone Number has been confirmed."
+                    $scope.checkLogin();
+                    if (data.success == true) {
+                        //  $rootScope.reg_message_success = "Thanks for registering. Please confirm your Display Name"
+                        //   $scope.login();
+                    }
+                });
+            }
+        }
         $scope.save_password = function() {
             $scope.submitted = true;
             if ($scope.fields.password.length < 1) {
@@ -111,7 +139,7 @@ angular.module('envite.user', ['ngRoute'])
                 $http({
                     method: 'POST',
                     url: express_endpoint + '/register',
-                    data: 'name=' + $scope.user.username + '&password=' + $scope.fields.password,
+                    data: 'name=' + $scope.user.username + '&password=' + $scope.fields.password + '&phone=' + $scope.user.phone,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
@@ -163,6 +191,7 @@ angular.module('envite.user', ['ngRoute'])
                     if (data['user'][0]['username']) {
                         $scope.username = data['user'][0].username
                         $scope.phone = data['user'][0].phone
+                        $scope.phone_confirmed = data['user'][0].phone_confirmed
                         if (data['user'][0].displayname) {
                             $scope.displayname = data['user'][0].displayname;
                         } else {
@@ -197,6 +226,7 @@ angular.module('envite.user', ['ngRoute'])
         };
 
         $scope.userSave = function() {
+           if ($scope.phone_confirmed == "true"){
             $http({
                     method: 'POST',
                     url: express_endpoint + '/api/usersave/',
@@ -209,11 +239,14 @@ angular.module('envite.user', ['ngRoute'])
                     if ($rootScope.reg_message_success) {
                         $rootScope.reg_message_success = null;
                     }
-                    $location.url('/all_events');
+                    $location.url('/my_group_sms');
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
                 });
+           }else{
+              $rootScope.reg_message_success = "Please confirm phone"
+           }
         };
 
         $scope.login = function() {
@@ -231,6 +264,7 @@ angular.module('envite.user', ['ngRoute'])
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).success(function(data) {
+                        console.log("dasfadsfadsfasfads");
                     if ($rootScope.reg_message_success) {
                         $rootScope.reg_message_success = null;
                     }
@@ -240,8 +274,8 @@ angular.module('envite.user', ['ngRoute'])
                //         $rootScope = $rootScope.$new(true);
                         $rootScope.isUserLoggedIn = true;
 
-                        if (data.user_displayname) {
-                            $location.url('/event_list');
+                        if (data.phone_confirmed == 'true') {
+                            $location.url('/my_group_sms');
                         } else {
                             $location.url('/user');
                         }

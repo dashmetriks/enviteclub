@@ -1,19 +1,42 @@
 <p>
     <input type="text" placeholder="Search..." ng-model="searchFor" size="20"/>
-    <button type="button" class="btn btn-default" ng-show="isUserLoggedIn" ng-click="open()">Create New Event</button>  
   </p>
 
 <div>
-<form class="well" name="form.myForm2">
+    <div  ng-controller="invitesController" ng-init="getEventList()">
+
+<div ng-hide="create_more">
+   <a href="/plans"> Upgrade to create more groups </a>
+</div>
+<div ng-show="create_more">
+  <form class="well" name="form.myForm2">
                         <input type="text" class="form-control input-md text-center" name="addGroup" placeholder="Create New Text Group" ng-model="formData.text" required>
+
+
+  <label>
+    <input type="radio" ng-model="reply.value" value="reply_all">
+    Reply All
+  </label><br/>
+  <label>
+    <input type="radio" ng-model="reply.value" value="reply_me">
+    Reply Me {{ twilio_number_count }} {{ event_count }}
+  </label><br/>
+
                         <input type="button" value="Submit" ng-click="create_new_sms_group()" class="btn btn-primary btn-sm" ng-disabled="form.myForm2.addGroup.$pristine && form.myForm2.addGroup.$invalid">
-                        <input class="btn btn-primary btn-sm" type="button" value="Change Settings" ng-click="invite_change()">
                     </form>
 </div>
-    <div  ng-controller="invitesController" ng-init="getEventList()">
                 <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
     <div style="padding-left:10px; padding-bottom:10px">
-                        <h4><a href='/phone_list/{{ event._id }}'> {{ event.event_title}} </a>  </h4> 
+                        <h4><a href='/sms_group/{{ event._id }}'> {{ event.event_title}} </a>  </h4> 
+                        <h4>Texts Sent: {{ events_comments_count[0][event._id] }} </h4>
+                        <h4>Texts Received: {{ events_message_count[0][event._id] }} </h4>
+                        <h4>Group members: {{ events_group_count[0][event._id] }} </h4>
+                        <h4>{{ event.event_reply_setting | rtext:'sdate' }}  </h4> 
+                        <h4>{{ event.event_twilio_number}}  </h4> 
+
+                  <div class="box" ng-show="events_comments_count[0][event._id] > 0" > 
+                  Last Text:  <span ng-init="setthetime(events_last_comment[0][event._id]['_id'], events_last_comment[0][event._id]['created_at'])"><timer ng-repeat="timer in timers | filter:{ invite_code: events_last_comment[0][event._id]['_id'] }  track by $index"> </timer></span> 
+                  </div>
 <button type="submit" class="btn btn-primary btn-xs" ng-if="logged_in_userid == event.event_creator" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
            <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
                 </div>

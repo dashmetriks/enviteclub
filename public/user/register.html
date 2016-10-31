@@ -6,6 +6,11 @@
                 <form name="userForm" class="well">
                     <!-- EMAIL -->
                     <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid &&  submitted }">
+                        <label>Phone</label>
+                        <input type="text" class="form-control" name="phone" ng-model="user.phone" required/>
+                        <p ng-show="userForm.phone.$invalid && submitted" class="help-block">Provide Valid Phone.</p>
+                    </div>
+                    <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid &&  submitted }">
                         <label>Email</label>
                         <input type="email" class="form-control" name="username" ng-model="user.username" required/>
                         <p ng-show="userForm.username.$invalid && submitted" class="help-block">Provide Valid Email.</p>

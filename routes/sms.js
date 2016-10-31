@@ -1,4 +1,6 @@
 var Invite = require('../app/models/invites');
+var Plan = require('../app/models/plans');
+var Messages = require('../app/models/messages');
 var User = require('../app/models/user');
 var Baby = require('babyparse');
 var Event = require('../app/models/events');
@@ -6,6 +8,7 @@ var Comments = require('../app/models/comments');
 var crypto = require('crypto');
 var config = require('../config');
 var client = require('twilio')(config.twilio_sid, config.twilio_token);
+var async = require("async");
 
 function randomValueHex(len) {
     return crypto.randomBytes(Math.ceil(len / 2))
@@ -29,7 +32,7 @@ exports.sendsms_invite = function(req, res) {
                     invited_phone: req.body.phone,
                     invited_type: req.body.type,
                     invite_code: randomValueHex(8),
-                    invite_status: "Sent"
+                    invite_status: "Added"
                 },
                 function(err, new_invite) {
                     console.log(events[0]["event_title"])
@@ -69,8 +72,7 @@ exports.sendsms_invite = function(req, res) {
         });
 }
 
-exports.sendsms = function(req, res) {
-
+exports.sendsms = function(req, res, callback) {
     User.findOne({
         _id: req.decoded._doc._id
     }, function(err, user) {
@@ -87,7 +89,7 @@ exports.sendsms = function(req, res) {
 
         Invite.find({
                 event_id: req.params.event_id,
-                invite_status: "Sent"
+                invite_status: "Added"
             },
             null, {
                 sort: {
@@ -97,32 +99,65 @@ exports.sendsms = function(req, res) {
             function(err, invites) {
                 if (err) res.send(err)
                 console.log(invites);
+                
                 //  
+                     var body_message = req.body.message;
                 invites.forEach(function(doc) {
-                    //console.log(doc.name + " is a " + doc.category_code + " company.");
-                    if (doc.invited_email != "jdjdj@222.com") {
-                        console.log(doc.invited_phone)
-                        console.log(user.displayname)
-                        client.sendMessage({
+                     async.series([
+                        function(callback) {
+                           Messages.findOne({
+                                   event_id: req.params.event_id,
+                                   user_phone: doc.invited_phone, 
+                                   twilio_number: doc.twilio_number, 
+                                   owner_phone: user.phone
+                               },
+                               function(err, message_result) {
 
-                            to: '+1' + doc.invited_phone, // Any number Twilio can deliver to
-                            //from: '+14152149049', // A number you bought from Twilio and can use for outbound communication
-                            //from: '+15102294542', // A number you bought from Twilio and can use for outbound communication
+                                      console.log('nooooooooooooooooooooooo')
+                                      console.log(message_result)
+                                   if (err) throw err;
+                                   if (message_result){
+                                      console.log('yyeeeeeeeeeeeeeeeeeeee')
+                                      body_message = req.body.message
+                                   }else{
+                                      body_message = req.body.message + '-Reply GETOUT to stop receving messages'
+                                   }
+                               callback();
+                               });
+                        },
+                        function(callback){
+                                      console.log('d8d8d88d8d8')
+                                      console.log(doc.invited_phone)
+
+                         client.sendMessage({
+                            to: '+1' + doc.invited_phone, 
                             from: doc.twilio_number,
-                            //body: req.body.sms_type // body of the SMS message
-                            body: user.displayname + ' says: ' + req.body.message
+                            //body: user.displayname + ' says: ' + req.body.message
+                            body: user.displayname + ' says: ' + body_message 
 
-                        }, function(err, responseData) { //this function is executed when a response is received from Twilio
+                         }, function(err, responseData) { 
                             res.end('Done')
                             console.log(err)
-                            if (!err) { // "err" is an error received during the request, if any
-
+                            if (!err) { 
                             }
-                        });
-                    }
-                    //    res.json({ 'invites': invites });
+                           Messages.create({
+                                   event_id: req.params.event_id,
+                                   user_phone: doc.invited_phone, 
+                                   twilio_number: doc.twilio_number, 
+                                   owner_phone: user.phone
+                               },
+                               function(err, result) {
+                                   if (err)
+                                       throw err;
+                               });
+                            callback();
+                         });
+                        }
+                    ], function(err) {
+                        if (err) return next(err);
                 });
             });
+    });
     });
 }
 
@@ -163,6 +198,37 @@ exports.sendcsvsms = function(req, res) {
     });
 }
 
+exports.planstatus = function(req, res){
+    User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+        if (err) throw err;
+                        Plan.find({
+                               user_id: req.decoded._doc._id
+                            },
+                            function(err, plans) {
+                                if (err) throw err;
+                              
+                        Messages.count({
+                               user_phone: user.phone 
+                            },
+                            function(err, messages) {
+                                if (err) throw err;
+                        Event.count({
+                               event_creator: req.decoded._doc._id
+                            },
+                            function(err, event_count) {
+                                if (err) throw err;
+                              console.log(event_count);
+                            res.json({
+                                'plans': plans,
+                                'date_now': Date.now(),
+                                'event_count': event_count, 
+                                'message_count': messages
+                            });
+                            });
+                            });
+                            });
+        });
+}
 
 exports.smsdata = function(req, res) {
 
@@ -174,7 +240,7 @@ exports.smsdata = function(req, res) {
 
     Invite.find({
             twilio_number: req.query.To,
-            invite_status: "Sent"
+            invite_status: "Added"
         },
         null, {
             sort: {
@@ -189,6 +255,14 @@ exports.smsdata = function(req, res) {
                 },
                 function(err, sms_sender) {
                     if (err) res.send(err)
+       Event.find({
+            _id: sms_sender.event_id 
+        },
+        function(err, events) {
+            if (err)
+                throw err;
+                        console.log(events[0].event_reply_setting)
+
                     if (sms_sender) {
                         console.log(req.query.Body)
                     }
@@ -221,6 +295,7 @@ exports.smsdata = function(req, res) {
                         function(err, result) {
                             if (err) throw err;
                         });
+                  if (events[0].event_reply_setting == 'reply_all') {
                     invites.forEach(function(doc) {
                         if (doc.invited_phone) {
                             console.log(doc.invited_phone)
@@ -230,12 +305,47 @@ exports.smsdata = function(req, res) {
                                 body: sms_sender.invited + ' says: ' + req.query.Body
 
                             }, function(err, responseData) {
+                               Messages.create({
+                                   event_id: sms_sender.event_id,
+                                   user_phone: doc.invited_phone, 
+                                   twilio_number: doc.twilio_number, 
+                                   owner_phone: sms_sender.event_creator_phone 
+                               },
+                               function(err, result) {
+                                   if (err)
+                                       throw err;
+                               });
                                 res.end('Done')
                                 if (!err) {}
                             });
                         }
                     });
+                  } else {
+                            client.sendMessage({
+                              //  to: '+1' + doc.invited_phone,
+                                to: '+1' + events[0].event_creator_phone, 
+                                from: req.query.To,
+                                body: sms_sender.invited + ' says: ' + req.query.Body
+
+                            }, function(err, responseData) {
+                               Messages.create({
+                                   event_id: sms_sender.event_id,
+                                   user_phone: doc.invited_phone, 
+                                   twilio_number: doc.twilio_number, 
+                                   owner_phone: sms_sender.event_creator_phone 
+                               },
+                               function(err, result) {
+                                   if (err)
+                                       throw err;
+                               });
+                                res.end('Done')
+                                if (!err) {}
+                            });
+    
+
+                  }
                 });
+           });
         });
 
 

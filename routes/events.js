@@ -4,6 +4,7 @@ var Invite = require('../app/models/invites');
 var Event = require('../app/models/events');
 var Player = require('../app/models/players');
 var Comments = require('../app/models/comments');
+var Messages = require('../app/models/messages');
 var Twilio = require('../app/models/twilio');
 var async = require("async");
 var crypto = require('crypto');
@@ -46,6 +47,8 @@ exports.new_event = function(req, res) {
                     event_image: req.body.image,
                     //event_twilio_number: '+15102294542',
                     event_twilio_number: twilio.twilio_number,
+                    event_reply_setting: req.body.reply_setting,
+                    event_creator_phone: user.phone, 
                     event_creator_displayname: user.displayname
 
                 }, function(err, event_created) {
@@ -65,10 +68,6 @@ exports.new_event = function(req, res) {
                             console.log(result)
                         });
 
-
-
-
-
                     Invite.create({
                             event_id: event_created._id,
                             inviter: user.username,
@@ -82,7 +81,7 @@ exports.new_event = function(req, res) {
                             //     invited_type: req.body.type,
                             invite_code: randomValueHex(8),
                             event_creator: "Yes",
-                            invite_status: "Sent"
+                            invite_status: "Added"
                         },
                         function(err, new_invite) {
                             Player.create({
@@ -199,6 +198,7 @@ exports.eventsave = function(req, res) {
             $set: {
                 event_title: req.body.event_title,
                 event_location: req.body.event_location,
+                event_reply_setting: req.body.reply_setting,
                 event_start: req.body.event_start
             }
         },
@@ -217,6 +217,7 @@ exports.my_event_list2 = function(req, res) {
     var player_no_count = []
     var pushY = {};
     var comments_array = {}
+    var comments_last = {}
     var pushN = {};
     var pushList = {};
     var invites_cnt = {};
@@ -237,11 +238,10 @@ exports.my_event_list2 = function(req, res) {
                             res.send(err)
                         player_data.push(events2);
                     });
-                Player.count({
+                Messages.count({
                         event_id: events.event_id,
-                        in_or_out: 'No'
                     },
-                    function(err, players_no) {
+                    function(err, message_count) {
                         if (err)
                             res.send(err)
                         Player.count({
@@ -262,6 +262,15 @@ exports.my_event_list2 = function(req, res) {
                                             },
                                             function(err, comments_count) {
                                                 if (err) res.send(err)
+                                        Comments.findOne({
+                                                event_id: events.event_id
+                                            }, null, {
+                                                 sort: {
+                                                 "created_at": -1
+                                                 }
+                                            },
+                                            function(err, comments_last_one) {
+                                                if (err) res.send(err)
 
                                                 Player.find({
                                                         user_id: req.decoded._doc._id,
@@ -272,12 +281,14 @@ exports.my_event_list2 = function(req, res) {
                                                             res.send(err)
                                                             // player_data3.push(players_list);
                                                         pushList[events.event_id] = players_list
-                                                        pushN[events.event_id] = players_no
+                                                        pushN[events.event_id] = message_count
                                                         pushY[events.event_id] = players_yes
                                                         comments_array[events.event_id] = comments_count
+                                                        comments_last[events.event_id] = comments_last_one
                                                         invites_cnt[events.event_id] = invite_count
                                                         callback();
                                                     });
+                                            });
                                             });
                                     });
                             });
@@ -289,8 +300,10 @@ exports.my_event_list2 = function(req, res) {
                     'logged_in_userid': req.decoded._doc._id,
                     'event_invites': [pushList],
                     //  'event_invites': player_data3,
-                    'event_no': [pushN],
+                    'message_count': [pushN],
+                    'date_now': Date.now(),
                     'comments_count': [comments_array],
+                    'comments_last': [comments_last],
                     'invites': [invites_cnt]
                 });
             });

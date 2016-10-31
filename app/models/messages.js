@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-module.exports = mongoose.model('Twilio', new Schema({
+module.exports = mongoose.model('Messages', new Schema({
     event_id: String,
     twilio_number: String,
     number_status: String,

@@ -373,11 +373,10 @@ function get_event_data(event_id, user_id, callback) {
                                 function(err, players_no) {
                                     if (err)
                                         res.send(err)
-                                    Player.find({
+                                    Invite.find({
                                             event_id: event_id,
-                                            in_or_out: 'Maybe'
                                         },
-                                        function(err, players_maybe) {
+                                        function(err, invites) {
                                             if (err)
                                                 res.send(err)
                                             Event.find({
@@ -414,7 +413,7 @@ function get_event_data(event_id, user_id, callback) {
                                                                     'is_member': is_member,
                                                                     'players_yes': players_yes,
                                                                     'players_no': players_no,
-                                                                    'players_maybe': players_maybe,
+                                                                    'invites': invites,
                                                                     'comments': comments,
                                                                 });
                                                                 return callback(data);

@@ -1,4 +1,6 @@
 var Invite = require('../app/models/invites');
+var Plan = require('../app/models/plans');
+var User = require('../app/models/user');
 var config = require('../config');
 var crypto = require('crypto');
 var Event = require('../app/models/events');
@@ -55,6 +57,32 @@ exports.invitedlist = function(req, res) {
         });
 }
 
+exports.addplan = function(req, res){
+var planobj = { 
+    fred: { twilio_number_count: 1, sms_count: 100, days: 7, melons: 0 }, 
+    mary: { twilio_number_count: 2, sms_count: 500, days: 30, melons: 0 }, 
+    sarah: { twilio_number_count: 3, sms_count: 1000, days: 30, melons: 0 } 
+}
+console.log('odododo')
+console.log(req.body.plan_type)
+    User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+        if (err) throw err;
+                        Plan.create({
+                               user_id: req.decoded._doc._id,
+                                twilio_number_count: planobj[req.body.plan_type]['twilio_number_count'], 
+                                sms_count: planobj[req.body.plan_type]['sms_count'], 
+                                days: planobj[req.body.plan_type]['days'] 
+                            },
+                            function(err, plans) {
+                                if (err)
+                                    throw err;
+                            res.json({
+                                'plans': plans
+                            });
+                            });
+        });
+}
+
 exports.addphone = function(req, res) {
 
     Event.find({
@@ -73,7 +101,7 @@ exports.addphone = function(req, res) {
                     invited_phone: req.body.phone,
                     invited_type: req.body.type,
                     invite_code: randomValueHex(8),
-                    invite_status: "Sent"
+                    invite_status: "Added"
                 },
                 function(err, new_invite) {
                     console.log(events[0]["event_title"])

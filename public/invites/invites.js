@@ -45,6 +45,10 @@ angular.module('envite.invite', [
             templateUrl: 'invites/sms_group_list.html',
             controller: 'invitesController'
         })
+        .when('/plans', {
+            templateUrl: 'invites/plans.html',
+            controller: 'invitesController'
+        })
         .when('/all_events', {
             templateUrl: 'invites/all_events.html',
             controller: 'invitesController'
@@ -361,6 +365,22 @@ $scope.mytime = new Date();
  };
 })
 
+.filter('rtext', function($filter)
+{
+ return function(input,frmt)
+ {
+  if(input == null){ return ""; } 
+  
+  var reply_text = {"reply_all":"Reply All", "reply_me":"Reply Me"}
+ 
+  if (frmt == 'sdate'){ 
+   var _date = reply_text[input] 
+  }
+ 
+  return _date;
+
+ };
+})
 //.controller('invitesController', ['$scope','$http', '$window', '$location', '$routeParams', '$rootScope', 'FileUploader', 
 .controller('invitesController', 
     function($scope,   $http, $window, $location, $routeParams, $rootScope , FileUploader, $uibModal) {
@@ -493,10 +513,14 @@ $scope.mytime = new Date();
 
         $scope.editEvent = function() {
             $scope.eventEdit = 'YES';
+/*
+            console.log($scope.event_data.event_twilio_number)
             $scope.event_data = {
                 event_title: $scope.event_title,
                 event_date: $scope.event_date,
-                event_location: $scope.event_location
+                event_location: $scope.event_location,
+                event_twilio_number: $scope.event_twilio_number,
+                event_location: $scope.event_reply_setting
             }
             $scope.set = function(event_title) {
                 this.event_data.event_title = event_title;
@@ -507,6 +531,13 @@ $scope.mytime = new Date();
             $scope.set = function(event_date) {
                 this.event_data.event_date = event_date;
             }
+            $scope.set = function(event_twilio_number) {
+                this.event_data.event_twilio_number = event_twilio_number;
+            }
+            $scope.set = function(event_reply_setting) {
+                this.event_data.event_reply_setting = event_reply_setting;
+            }
+*/
         }
 
         $scope.cancelEditEvent = function() {
@@ -627,6 +658,46 @@ $scope.mytime = new Date();
                 });
         };
 
+        $scope.planstatus = function() {
+            console.log('asdfadsf444');
+            $http({
+                    method: 'GET',
+                    url: express_endpoint + '/api/planstatus/',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                    $scope.sms_count = data['plans'][0]['sms_count'];
+                    $scope.twilio_number_count = data['plans'][0]['twilio_number_count'];
+                    $scope.event_count = data['event_count'];
+                    if (data['event_count'] < data['plans'][0]['twilio_number_count']){
+                        $scope.create_more = true; 
+                    }else{
+                        $scope.create_more = false; 
+                    }
+                         
+                    console.log(data);
+                    $scope.plan_start_date = data['plans'][0]['start_time'];
+                    $scope.message_count = data['message_count'];
+                    $scope.count_percent = (data['message_count'] / data['plans'][0]['sms_count'] ) * 100
+                    
+                  
+                   var myDate = +new Date($scope.plan_start_date)
+                   $scope.date_now = data['date_now'];
+                   $scope.plan_days = data['plans'][0]['days'];
+                   $scope.days_since_start = Math.round((($scope.date_now - myDate)/ 1000 /86400))
+                   $scope.day_percent = Math.round(($scope.days_since_start / data['plans'][0]['days'] ) * 100)
+                   console.log($scope.date_now);
+                   console.log($scope.plan_start_date);
+                   console.log($scope.day_percent)
+                })
+                .error(function(data) {
+                    $scope.showLoginToInvite = true;
+                    console.log('Error: ' + data);
+                });
+        }
+
         $scope.checkLogin = function() {
             $http({
                     method: 'GET',
@@ -656,10 +727,11 @@ $scope.mytime = new Date();
                 });
         }
 
-
+        $scope.reply =  {value: 'reply_me'}
 
 
         $scope.getEventList = function() {
+            console.log('wwwoooo');
             $http({
                     method: 'GET',
                     url: express_endpoint + '/api/my_event_list2/',
@@ -669,12 +741,19 @@ $scope.mytime = new Date();
                     }
                 }).success(function(data) {
                     console.log(data['comments_count'])
+              //      $scope.timers = [];
+              //       
                     $scope.events = data['my_events'];
+                    console.log($scope.timers)
                     $scope.events_invite = data['event_invites'][0];
                     console.log(data['my_events']);
                     $scope.logged_in_userid = data['logged_in_userid'];
                     $scope.events_yes_count = data['event_yes'];
+                    $scope.date_now = data['date_now'];
                     $scope.events_comments_count = data['comments_count'];
+                    $scope.events_message_count = data['message_count'];
+                    $scope.events_last_comment = data['comments_last'];
+                    $scope.events_group_count = data['invites'];
                     $rootScope.isUserLoggedIn = true;
 
                 })
@@ -822,6 +901,9 @@ $scope.mytime = new Date();
                 });
         };
 
+        $scope.newValue = function(value) {
+           console.log(value);
+        }
 
         $scope.getEvent = function(id) {
             if ($window.localStorage.getItem('token') == null) {
@@ -856,6 +938,9 @@ $scope.mytime = new Date();
                     $scope.event_id = data['event'][0]._id;
                     $scope.event_title = data['event'][0].event_title;
                     $scope.yeses = data['players_yes'];
+                    //$scope.reply =  {value: 'reply_all'}
+                    $scope.reply =  {value: data['event'][0].event_reply_setting}
+                    $scope.invites = data['invites'];
                     $scope.nos = data['players_no'];
                     $scope.date_now = data['date_now'];
                     $scope.players_list = data['players_list'];
@@ -1029,8 +1114,8 @@ $scope.mytime = new Date();
 
 
         $scope.create_new_sms_group = function() {
-        // $scope.uploader.queue.upload() 
-         console.log("saddddd")
+         
+            console.log($scope.reply.value)
          
             $scope.submitted = true;
             //if ($scope.formData.text.length < 1) {
@@ -1040,7 +1125,7 @@ $scope.mytime = new Date();
                 $http({
                         method: 'POST',
                         url: express_endpoint + '/api/new_event',
-                        data: 'text=' + $scope.formData.text ,
+                        data: 'text=' + $scope.formData.text + '&reply_setting=' + $scope.reply.value ,
 
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -1048,12 +1133,12 @@ $scope.mytime = new Date();
                         }
                     }).success(function(data) {
 
-                      //  $scope.getEventList();
-                            $location.url('/my_group_sms');
+               //             $location.url('/my_group_sms');
 
-                        $scope.submitted = false;
+        //                $scope.submitted = false;
                         delete $scope.formData.text
-                        delete $scope.formData.event_location
+         //               delete $scope.formData.event_location
+                        $scope.getEventList();
                     })
                     .error(function(data) {
                         console.log('Error: ' + data);
@@ -1094,18 +1179,37 @@ $scope.mytime = new Date();
             }
         };
 
+        $scope.createplan = function(plan_type) {
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/addplan/',
+                    data: 'plan_type=' + plan_type, 
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                   // $scope.eventEdit = 'NO';
+                  //  $scope.getEvent();
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
+
+
         $scope.editEventSave = function() {
             $http({
                     method: 'POST',
                     url: express_endpoint + '/api/eventsave/' + $scope.event_id,
-                    data: 'event_title=' + $scope.event_data.event_title + '&event_start=' + $scope.event_data.event_date + '&event_location=' + $scope.event_data.event_location,
+                    data: 'event_title=' + $scope.event_data.event_title + '&event_start=' + $scope.event_data.event_date + '&event_location=' + $scope.event_data.event_location + '&reply_setting=' + $scope.reply.value ,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
                     $scope.eventEdit = 'NO';
-                    $scope.getEventInvite();
+                    $scope.getEvent();
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
@@ -1135,9 +1239,9 @@ $scope.timers = [];
   $scope.counter2 = 1500;
   $scope.setthetime = function(ob_id, created_at) {
     var myDate = +new Date(created_at)
-//    console.log(myDate)
  //   console.log(($scope.date_now - myDate)/ 1000)
     var start_cnt = Math.round(($scope.date_now - myDate)/ 1000)
+    console.log(start_cnt)
     $scope.timers.push({invite_code: ob_id, strtime: start_cnt}) ;
   };
 

@@ -135,6 +135,7 @@ app.post('/resetpassword/:reset_code', user.resetpassword);
 app.get('/resetcheck/:reset_code', user.reset_check);
 apiRoutes.get('/userget', user.userget);
 apiRoutes.post('/passwordsave', user.passwordsave);
+apiRoutes.post('/confirmphone', user.confirmphone);
 apiRoutes.post('/usersave', user.usersave);
 
 apiRoutes.post('/new_event', events.new_event);
@@ -164,8 +165,10 @@ apiRoutes.get('/invited/:event_id', invites.invitedlist);
 apiRoutes.post('/addinvite/:event_id/', invites.addinvite); 
 apiRoutes.delete('/deleteinvite/:invite_id', invites.deleteinvite);
 apiRoutes.post('/addphone/:event_id/', invites.addphone); 
+apiRoutes.post('/addplan', invites.addplan); 
 apiRoutes.post('/sendsms/:event_id/', sms.sendsms);
 app.get('/smsdata', sms.smsdata);
+apiRoutes.get('/planstatus', sms.planstatus);
 apiRoutes.post('/sendcsvsms', sms.sendcsvsms);
 
 app.use('/api', apiRoutes);

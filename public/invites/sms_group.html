@@ -1,62 +1,16 @@
-<body ng-controller="invitesController">
-
-    <script type="text/ng-template" id="loginModal.html">
-        <div class="modal-header">
-            <h3 class="modal-title">Login bs</h3>
-        </div>
-        <div class="modal-body">          
-        <div class="well">
-            <form name="eventForm">
-        <div >
-
-    <div class="container" ng-init="loginForm()">
-        <div class="col-md-5">
-            <h3> Login {{ loginForm }} </h3>
-            <form name="userForm" class="well">
-                <!-- EMAIL -->
-                <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid &&  submitted }">
-                    <label>Email</label>
-                    <input type="email" class="form-control" name="username" ng-model="user.username" required/>
-                    <p ng-show="userForm.username.$invalid && submitted" class="help-block">Provide Valid Email.</p>
-                </div>
-                <!-- password1 -->
-                <div class="form-group" ng-class="{ 'has-error' : userForm.password.$invalid &&  submitted }">
-                    <label>Password</label>
-                    <input id="password" name="password" ng-model="fields.password" class="form-control" required type="password" />
-                    <p ng-show="(userForm.password.$invalid && submitted) || noPassword" class="help-block">Password is required.</p>
-                </div>
-                <input type="button" value="Login" ng-click="login()" class="btn btn-primary" />
-            </form>
-            <h3> {{login_message}} </h3>
-            <h4><a href="/register">Register</a> *  <a href="/password_reset">Reset Password</a>  </h4>
-        </div>
-      </div>
-
-
-     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-        </div>    
-</script>
-
-
-
-
-    <div class="container" ng-init="getEvent()">
+    <div class="container" ng-init="getEvent()" ng-controller="invitesController" ng-show="isEventCreator">
       <!--  <input type="button" value="Purchase" ng-click="wtf()" class="btn btn-primary btn-sm"  > -->
         <!-- HEADER AND TODO COUNT -->
         <div class="row">
             <div class="col-sm-5">
                 <div class="well text-left" ng-if="eventEdit != 'YES'">
-                  <img src='/uploads/{{ event_data.event_image}}' height=auto width=100%> </br>
-                    <h4>{{ event_data.event_title}}</h4>
-                    <h4> Date: {{ event_data.event_start | date1:'sdate' }} {{ event_data.event_time | date1:'stime' }} </h4>
-                    <h4>Location: {{event_data.event_location}} </h4>
-                    <h4>Host: {{event_data.event_creator_displayname}} </h4>
+                    <h4>Group Name: {{ event_data.event_title}}</h4>
                     <h4>SMS number: {{event_data.event_twilio_number}} </h4>
+                    <h4>Reply Setting: {{event_data.event_reply_setting | rtext:'sdate'}} </h4>
                     <label ng-if="isUserLoggedIn">
                         <div ng-repeat="user in players_list">
                             <span ng-if="invite_code == user.invite_code && event_creator_id == user.user_id">
                     <input type="button" value="Edit Event" ng-click="editEvent()" class="btn btn-primary btn-sm"  >
-                            <a href="/invited_list/{{ event_id}}" > Invites </a> 
                         </span>
                         </div>
                     </label>
@@ -70,61 +24,41 @@
                                 <span class="error" ng-show="myForm.event_title.$error.required">
         Required</span>
                             </div>
+<label>
+    <input type="radio" ng-model="reply.value" value="reply_all" ng-change='newValue(reply.value)'>
+    Reply All
+  </label><br/>
+  <label>
+    <input type="radio" ng-model="reply.value" value="reply_me" ng-change='newValue(reply.value)'>
+    Reply Me
+  </label><br/>
                         </div>
-                        <div class="form-group">
-                            <label>Location</label>
-                            <input type="text" name="event_location" class="form-control input-md text-left" value="event_data.event_location" ng-model="event_data.event_location" required>
-                            <div role="alert">
-                                <span class="error" ng-show="myForm.event_location.$error.required">
-        Required</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <p class="form-control-static">{{ event_data.event_date}}</p>
-                        </div>
-                        <h4>Pick a date and time</h4>
-                        <form class="form-horizontal">
-                            <div class="form-group">
-                                <div class="col-sm-5">
-                                    <p class="input-group">
-                                        <input type="text" class="form-control" datetime-picker="MM/dd/yyyy HH:mm" ng-model="event_data.event_date" is-open="ctrl.open.date3" />
-                                        <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" ng-click="ctrl.openCalendar($event, 'date3')"><i class="fa fa-calendar"></i></button>
-                                    </span>
-                                    </p>
-                                </div>
-                            </div>
                         </form>
                         <input type="button" value="Save Event" ng-disabled="(myForm.event_title.$dirty && myForm.event_title.$invalid) || (myForm.event_location.$dirty && myForm.event_location.$invalid)" ng-click="editEventSave()" class="btn btn-primary btn-sm">
                         <input type="button" value="Cancel" ng-click="cancelEditEvent()" class="btn btn-primary btn-sm">
                     </form>
                 </div>
-                <div ng-if="isMember">
-                        <form class="form-inline well" name="myForm">
-                            <div class="form-group">
-                                <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
-                                <label>Display Name</label>
-                                <input type="text" name="displayname" class="form-control input-sm text-center" placeholder="name" ng-model="formData.text" required>
-                                <div role="alert">
-                                </div>
-                                <br/>
-                                <label>Phone</label>
-                                <input type="text" name="username" class="form-control input-sm text-center" placeholder="4157771234" ng-model="formData.email" required>
-                                <div role="alert">
-                                    <span class="error" ng-show="myForm.username.$error.required">
-                                </div>
-                                <!--   <button type="submit"  ng-disabled="(myForm.displayname.$pristine && myForm.displayname.$invalid) && (myForm.username.$pristine && myForm.username.$invalid)" class="btn btn-primary btn-sm" ng-click="addInvite()">Invite</button> -->
-                                <button type="submit" ng-disabled="myForm.displayname.$invalid ||  myForm.username.$invalid" class="btn btn-primary btn-sm" ng-click="addPhone()">Add User to Group to be texted</button>
+                <div ng-if="isMember" class="well">
+                <form class="form-inline">
+                  <div class="form-group">
+                     <label for="disp">&nbsp;Name:</label>
+                         <input type="text" id="disp" name="displayname" class="form-control input-sm text-center" placeholder="name" ng-model="formData.text" required>
+                  </div>
+                  <div class="form-group">
+                                <label for="phone">Phone:</label>
+                                <input type="text" name="username" id="phone" class="form-control input-sm text-center" placeholder="4157771234" ng-model="formData.email" required>
+                                <button type="submit" ng-disabled="myForm.displayname.$invalid ||  myForm.username.$invalid" class="btn btn-default" ng-click="addPhone()">Add User</button>
                             </div>
                         </form>
                 </div>
-        <div class="col-md-6" ng-init="getInvites()">
+        <!-- <div class="col-md-6" ng-init="getInvites()"> -->
+        <div class="well" >
             <table class="table table-bordered table-striped table-hover">
                 <thead>
                     <tr>
-                        <td> <h4>Name</h4> </td>
-                        <td> <h4>Phone</h4> </td>
-                        <td> <h4>Status</h4> </td>
+                        <td>Name</td>
+                        <td>Phone</td>
+                        <td>Status</td>
                     </tr>
                 </thead>
                 <tr ng-repeat="x in invites">
@@ -262,23 +196,10 @@
 
                          <!--   <button type="submit"  ng-disabled="(myForm.displayname.$pristine && myForm.displayname.$invalid) && (myForm.username.$pristine && myForm.username.$invalid)" class="btn btn-primary btn-sm" ng-click="addInvite()">Invite</button> -->
 
-                            <button type="submit"   class="btn btn-primary btn-sm" ng-click="sendSMS()">Send text</button>
+                            <button type="submit"   class="btn btn-primary btn-sm" ng-click="sendSMS()">Send text</button><br><small> First time users will receive message saying "Reply GETOUT to leave Group" </small> 
                         </form>
                             </div>
-                <label>RSVPs </label>
-                <div class="well well-sm">
-                    <div ng-repeat="user in yeses">
-                        {{user.in_or_out}} - {{user.displayname}}
-                        <b>  <span ng-if="logged_in_userid == user.user_id"> -- You </span> </b>
-                        <i> <span ng-if="event_creator_id == user.user_id"> Host </span> </i>
-                    </div>
-                    <div ng-repeat="user in nos">
-                        {{user.in_or_out}} - {{user.displayname}}
-                        <b>  <span ng-if="logged_in_userid == user.user_id"> -- You </span> </b>
-                        <i> <span ng-if="event_creator_id == user.user_id"> Host </span> </i>
-                    </div>
-                </div>
-                <h3>Comments </h3>
+                <h3>Texts </h3>
                 <div class="well well-sm" ng-repeat="comment in comments">
                     "{{comment.text}}" by <b>  {{comment.displayname}} </b>
                     <span ng-init="setthetime(comment._id, comment.created_at)"><timer ng-repeat="timer in timers | filter:{ invite_code: comment._id }  track by $index"> </timer></span>
@@ -286,4 +207,3 @@
             </div>
         </div>
     </div>
-</body>
