@@ -1,168 +1,147 @@
 <p>
-    <input type="text" placeholder="Search..." ng-model="searchFor" size="20"/>
-  </p>
-
+    <input type="text" placeholder="Search..." ng-model="searchFor" size="20" />
+</p>
 <!--
 <div class="row">
   <div class="col-sm-6 col-md-4" ng-init="planstatus()" >
 -->
-<div >
-  <div  ng-init="planstatus()" >
-    <div ng-show="create_plan"> 
-    select plan to get started
-Your plan is {{ plan_name }}
-<br>
-Plans here
-<div class="row">
-   <div class="col-lg-10 col-md-10 col-sm-10">
-<div style="width: 150px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center">
-  <div style="padding-left:10px; padding-bottom:10px ;padding-top:10px ">
-<button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('fred')">Free 7 day trail</button><br>
-100 texts<br>
-1 SMS Group
-  </div>
-</div>
-<div style="width: 150px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center">
-  <div style="padding-bottom:10px ;padding-top:10px ">
-<button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('mary')">$5 month</button><br>
-500 texts<br>
-1 SMS Group<br>
-  </div>
-</div>
-<div style="width: 150px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center">
-  <div style="padding-bottom:10px ;padding-top:10px ">
-<button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('mary')">$10 month</button><br>
-1000 texts<br>
-2 SMS Groups
-  </div>
-</div>
-</div>
-         </div>
-  <div ng-hide="create_plan"> 
-Your plan is {{ plan_name }}
-<br>
-                     {{message_count}} / {{ sms_count}} texts
-         <div class="progress">
-           <div class="progress-bar" role="progressbar" aria-valuenow="{{ count_percent}}" aria-valuemin="0" aria-valuemax="100" style="width:{{ count_percent}}%"> {{count_percent}}%
-           </div>
-         </div>
-                     {{days_since_start}} / {{ plan_days}} days
-         <div class="progress">
-           <div class="progress-bar" role="progressbar" aria-valuenow="{{ day_percent}}" aria-valuemin="0" aria-valuemax="100" style="width:{{ day_percent}}%"> {{day_percent}}%
-           </div>
-         </div>
-         </div>
-         </div>
-         </div>
 <div>
-    <div  ng-controller="invitesController" ng-init="getEventList()">
-
-<div ng-hide="create_more || create_plan">
-   <a href="/plans"> Upgrade to create more groups </a>
-</div>
-<div ng-show="create_more">
-  <form class="well" name="form.myForm2">
-                        <input type="text" class="form-control input-md text-center" name="addGroup" placeholder="Create New Text Group" ng-model="formData.text" required>
-
-
-  <label>
-    <input type="radio" ng-model="reply.value" value="reply_all">
-    Reply All
-  </label><br/>
-  <label>
-    <input type="radio" ng-model="reply.value" value="reply_me">
-    Reply Me {{ twilio_number_count }} {{ event_count }}
-  </label><br/>
-
-                        <input type="button" value="Submit" ng-click="create_new_sms_group()" class="btn btn-primary btn-sm" ng-disabled="form.myForm2.addGroup.$pristine && form.myForm2.addGroup.$invalid">
-                    </form>
-</div>
-                <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
-    <div style="padding-left:10px; padding-bottom:10px">
-                        <h4><a href='/sms_group/{{ event._id }}'> {{ event.event_title}} </a>  </h4> 
-                        <h4>Texts Sent: {{ events_comments_count[0][event._id] }} </h4>
-                        <h4>Texts Received: {{ events_message_count[0][event._id] }} </h4>
-                        <h4>Group members: {{ events_group_count[0][event._id] }} </h4>
-                        <h4>{{ event.event_reply_setting | rtext:'sdate' }}  </h4> 
-                        <h4>{{ event.event_twilio_number}}  </h4> 
-
-                  <div class="box" ng-show="events_comments_count[0][event._id] > 0" > 
-                  Last Text:  <span ng-init="setthetime(events_last_comment[0][event._id]['_id'], events_last_comment[0][event._id]['created_at'])"><timer ng-repeat="timer in timers | filter:{ invite_code: events_last_comment[0][event._id]['_id'] }  track by $index"> </timer></span> 
-                  </div>
-<button type="submit" class="btn btn-primary btn-xs" ng-if="logged_in_userid == event.event_creator" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
-           <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
+    <div ng-init="planstatus()">
+        <div ng-show="create_plan">
+            select plan to get started Your plan is {{ plan_name }}
+            <br> Plans here
+            <div class="row">
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                    <div style="width: 150px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center">
+                        <div style="padding-left:10px; padding-bottom:10px ;padding-top:10px ">
+                            <button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('fred')">Free 7 day trail</button>
+                            <br> 100 texts
+                            <br> 1 SMS Group
+                        </div>
+                    </div>
+                    <div style="width: 150px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center">
+                        <div style="padding-bottom:10px ;padding-top:10px ">
+                            <button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('mary')">$5 month</button>
+                            <br> 500 texts
+                            <br> 1 SMS Group
+                            <br>
+                        </div>
+                    </div>
+                    <div style="width: 150px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center">
+                        <div style="padding-bottom:10px ;padding-top:10px ">
+                            <button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('mary')">$10 month</button>
+                            <br> 1000 texts
+                            <br> 2 SMS Groups
+                        </div>
+                    </div>
                 </div>
-                </div>
-
-<div>
-<style type="text/css">
-.modal.fade .modal-dialog {
-    transform: translate(-50%, -80%);
-}
-
-.modal.in .modal-dialog {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    margin-top: 10px;
-}
-
-    </style>
-    <script type="text/ng-template" id="myModalContent.html">
-        <div class="modal-header">
-            <h3 class="modal-title">Create New Text Group</h3>
+            </div>
         </div>
-        <div class="modal-body">            
-          
-        <div class="well">
-            <form name="eventForm">
-        <div >
-
-
-
-
-
-                <div class="form-group" ng-class="{ 'has-error' : eventForm.event_title.$invalid &&  submitted }">
-                    <label>Event Title</label>
-                    <input type="text" name="event_title" class="form-control input-md text-center" placeholder="Event Title" ng-model="formData.text" required>
-                    <p ng-show="(eventForm.event_title.$invalid && submitted) || noEventTitle" class="help-block">Provide Event Title.</p>
+        <div ng-hide="create_plan">
+            Your plan is {{ plan_name }}
+            <br> {{message_count}} / {{ sms_count}} texts
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{ count_percent}}" aria-valuemin="0" aria-valuemax="100" style="width:{{ count_percent}}%"> {{count_percent}}%
                 </div>
-                <div class="form-group" ng-class="{ 'has-error' : eventForm.event_location.$invalid &&  submitted }">
-                    <label>Event Location</label>
-                    <input type="text" name="event_location" class="form-control input-md text-center" placeholder="Event Location" ng-model="formData.event_location" required>
-                    <p ng-show="eventForm.event_location.$invalid && submitted" class="help-block">Provide Event Title.</p>
+            </div>
+            {{days_since_start}} / {{ plan_days}} days
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{ day_percent}}" aria-valuemin="0" aria-valuemax="100" style="width:{{ day_percent}}%"> {{day_percent}}%
                 </div>
-
-           
-    <fieldset>
-      <br>Photo:
-<label class="btn btn-default btn-file">Browse
-      <input type="file" ngf-select ng-model="picFile" name="file"    
-             accept="image/*" ngf-max-size="2MB" required style="display: none;"
-             ngf-resize="{width: 400, height: 200}"
-             ngf-model-invalid="errorFile">
-</label>
-      <i ng-show="eventForm.file.$error.required">*required</i><br>
-      <i ng-show="eventForm.file.$error.maxSize">File too large 
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <div ng-controller="invitesController" ng-init="getEventList()">
+        <div ng-hide="create_more || create_plan">
+            <a href="/plans"> Upgrade to create more groups </a>
+        </div>
+        <div ng-show="create_more">
+            <form class="well" name="form.myForm2">
+                <input type="text" class="form-control input-md text-center" name="addGroup" placeholder="Create New Text Group" ng-model="formData.text" required>
+                <label>
+                    <input type="radio" ng-model="reply.value" value="reply_all"> Reply All
+                </label>
+                <br/>
+                <label>
+                    <input type="radio" ng-model="reply.value" value="reply_me"> Reply Me {{ twilio_number_count }} {{ event_count }}
+                </label>
+                <br/>
+                <input type="button" value="Submit" ng-click="create_new_sms_group()" class="btn btn-primary btn-sm" ng-disabled="form.myForm2.addGroup.$pristine && form.myForm2.addGroup.$invalid">
+            </form>
+        </div>
+        <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
+            <div style="padding-left:10px; padding-bottom:10px">
+                <h4><a href='/sms_group/{{ event._id }}'> {{ event.event_title}} </a>  </h4>
+                <h4>Texts Sent: {{ events_comments_count[0][event._id] }} </h4>
+                <h4>Texts Received: {{ events_message_count[0][event._id] }} </h4>
+                <h4>Group members: {{ events_group_count[0][event._id] }} </h4>
+                <h4>{{ event.event_reply_setting | rtext:'sdate' }}  </h4>
+                <h4>{{ event.event_twilio_number}}  </h4>
+                <div class="box" ng-show="events_comments_count[0][event._id] > 0">
+                    Last Text: <span ng-init="setthetime(events_last_comment[0][event._id]['_id'], events_last_comment[0][event._id]['created_at'])"><timer ng-repeat="timer in timers | filter:{ invite_code: events_last_comment[0][event._id]['_id'] }  track by $index"> </timer></span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-xs" ng-if="logged_in_userid == event.event_creator" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
+                <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
+            </div>
+        </div>
+        <div>
+            <style type="text/css">
+            .modal.fade .modal-dialog {
+                transform: translate(-50%, -80%);
+            }
+            
+            .modal.in .modal-dialog {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                margin-top: 10px;
+            }
+            </style>
+            <script type="text/ng-template" id="myModalContent.html">
+                <div class="modal-header">
+                    <h3 class="modal-title">Create New Text Group</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="well">
+                        <form name="eventForm">
+                            <div>
+                                <div class="form-group" ng-class="{ 'has-error' : eventForm.event_title.$invalid &&  submitted }">
+                                    <label>Event Title</label>
+                                    <input type="text" name="event_title" class="form-control input-md text-center" placeholder="Event Title" ng-model="formData.text" required>
+                                    <p ng-show="(eventForm.event_title.$invalid && submitted) || noEventTitle" class="help-block">Provide Event Title.</p>
+                                </div>
+                                <div class="form-group" ng-class="{ 'has-error' : eventForm.event_location.$invalid &&  submitted }">
+                                    <label>Event Location</label>
+                                    <input type="text" name="event_location" class="form-control input-md text-center" placeholder="Event Location" ng-model="formData.event_location" required>
+                                    <p ng-show="eventForm.event_location.$invalid && submitted" class="help-block">Provide Event Title.</p>
+                                </div>
+                                <fieldset>
+                                    <br>Photo:
+                                    <label class="btn btn-default btn-file">Browse
+                                        <input type="file" ngf-select ng-model="picFile" name="file" accept="image/*" ngf-max-size="2MB" required style="display: none;" ngf-resize="{width: 400, height: 200}" ngf-model-invalid="errorFile">
+                                    </label>
+                                    <i ng-show="eventForm.file.$error.required">*required</i>
+                                    <br>
+                                    <i ng-show="eventForm.file.$error.maxSize">File too large 
           {{errorFile.size / 1000000|number:1}}MB: max 2M</i>
-      <img ng-show="eventForm.file.$valid" ngf-thumbnail="picFile" class="thumb"> <button ng-click="picFile = null" ng-show="picFile">Remove</button>
-      <br>
-      <button ng-disabled="!eventForm.$valid" 
-              ng-click="uploadPic(picFile)">Submit</button>
-      <span class="progress" ng-show="picFile.progress >= 0">
+                                    <img ng-show="eventForm.file.$valid" ngf-thumbnail="picFile" class="thumb">
+                                    <button ng-click="picFile = null" ng-show="picFile">Remove</button>
+                                    <br>
+                                    <button ng-disabled="!eventForm.$valid" ng-click="uploadPic(picFile)">Submit</button>
+                                    <span class="progress" ng-show="picFile.progress >= 0">
         <div style="width:{{picFile.progress}}%" 
             ng-bind="picFile.progress + '%'"></div>
       </span>
-      <span ng-show="picFile.result">Upload Successful</span>
-      <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
-    </fieldset>
-    <br>
-  </form>
-
-        </div>    
-     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-        </div>    
-</script>
-</div>
-
+                                    <span ng-show="picFile.result">Upload Successful</span>
+                                    <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
+                                </fieldset>
+                                <br>
+                        </form>
+                        </div>
+                        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+                    </div>
+            </script>
+            </div>
