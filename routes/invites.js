@@ -4,6 +4,7 @@ var User = require('../app/models/user');
 var config = require('../config');
 var crypto = require('crypto');
 var Event = require('../app/models/events');
+var stripe = require("stripe")("sk_test_bHQ01Hnro6LK3iNsx0r6JBs2");
 
 var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
@@ -57,13 +58,61 @@ exports.invitedlist = function(req, res) {
         });
 }
 
-exports.addplan = function(req, res){
-var planobj = { 
-    fred: { twilio_number_count: 1, sms_count: 100, days: 7, melons: 0 }, 
-    mary: { twilio_number_count: 2, sms_count: 500, days: 30, melons: 0 }, 
-    sarah: { twilio_number_count: 3, sms_count: 1000, days: 30, melons: 0 } 
+function add_plan(req, plan_type){
+
+  var planobj = { 
+    1: { twilio_number_count: 1, sms_count: 100, days: 7, melons: 0 }, 
+    2: { twilio_number_count: 1, sms_count: 500, days: 30, melons: 0 }, 
+    3: { twilio_number_count: 2, sms_count: 1000, days: 30, melons: 0 } 
+  }
+  User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+     if (err) throw err;
+   Plan.find({ user_id: req.decoded._doc._id }, function(err, existing_plan) {
+     if (existing_plan.length) {
+       console.log('plan already exists ----------------')
+        Plan.update({
+            user_id: req.decoded._doc._id,
+        }, {
+            $set: {
+              twilio_number_count: planobj[plan_type]['twilio_number_count'], 
+              sms_count: planobj[plan_type]['sms_count'], 
+              plan_name: plan_type, 
+              days: planobj[plan_type]['days'] 
+            }
+        },
+        function(err, result) {
+            if (err)
+                throw err;
+         return result;
+        });
+     } else {
+       Plan.create({
+            user_id: req.decoded._doc._id,
+            twilio_number_count: planobj[plan_type]['twilio_number_count'], 
+            sms_count: planobj[plan_type]['sms_count'], 
+            plan_name: plan_type, 
+            days: planobj[plan_type]['days'] 
+       },
+       function(err, plans) {
+         if (err) throw err;
+         console.log(plans)
+         return plans;
+//                            res.json({
+ //                               'plans': plans
+  //                          });
+       });
+      }
+    });
+  });
 }
+
+exports.addplan = function(req, res){
 console.log('odododo')
+var planobj = { 
+    1: { twilio_number_count: 1, sms_count: 100, days: 7, melons: 0 }, 
+    2: { twilio_number_count: 1, sms_count: 500, days: 30, melons: 0 }, 
+    3: { twilio_number_count: 2, sms_count: 1000, days: 30, melons: 0 } 
+}
 console.log(req.body.plan_type)
     User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
         if (err) throw err;
@@ -71,6 +120,7 @@ console.log(req.body.plan_type)
                                user_id: req.decoded._doc._id,
                                 twilio_number_count: planobj[req.body.plan_type]['twilio_number_count'], 
                                 sms_count: planobj[req.body.plan_type]['sms_count'], 
+                                plan_name: req.body.plan_type, 
                                 days: planobj[req.body.plan_type]['days'] 
                             },
                             function(err, plans) {
@@ -189,6 +239,40 @@ exports.deleteinvite = function(req, res) {
         if (err) res.send(err);
         res.json(invites);
     });
+}
+
+exports.subscribe = function(req, res) {
+
+        console.log("weeeeeee")
+	var stripeToken = req.body.stripeToken;
+	var totalcharge = req.body.totalcharge;
+	var plan = req.body.plan;
+               console.log(plan)
+
+	var charge = stripe.customers.create({
+		source: stripeToken,
+		plan: "sarah",
+		email: "payinguser3@example.com"
+	}, function(err, customer) {
+		if (err && err.type === 'StripeCardError') {
+               console.log("err")
+			// The card has been declined
+		} else {
+               console.log(customer)
+               add_plan(req, plan, function(data) {
+             //   res.json({
+              //      success: true,
+              //  });
+                // res.json(data);
+               });
+               res.json({
+                                'invites': customer
+                            });
+			//Render a thank you page called "Charge"
+		//	res.render('charge', { title: 'Charge' });
+		}
+	});
+
 }
 
 exports.join_event = function(req, res) {

@@ -127,6 +127,45 @@ apiRoutes.post('/charge', function(req, res) {
 	});
 
 });
+/*
+apiRoutes.post('/subscribe', function(req, res) {
+
+        console.log("weeeeeee")
+	var stripeToken = req.body.stripeToken;
+	var totalcharge = req.body.totalcharge;
+	var plan = req.body.plan;
+               console.log(plan)
+
+	var charge = stripe.customers.create({
+//		amount: 1100, // amount in cents, again
+//		amount: totalcharge, // amount in cents, again
+		//currency: "usd",
+		source: stripeToken,
+		plan: "sarah",
+		email: "payinguser3@example.com"
+	}, function(err, customer) {
+		if (err && err.type === 'StripeCardError') {
+               console.log("err")
+			// The card has been declined
+		} else {
+               console.log(customer)
+			//Render a thank you page called "Charge"
+//			res.render('charge', { title: 'Charge' });
+		}
+	});
+
+});
+*/
+
+app.post("/stripe/webhook", function(request, response) {
+  // Retrieve the request's body and parse it as JSON
+     //var event_json = JSON.parse(request.body);
+     console.log(request.body);
+  //
+  //     // Do something with event_json
+  //
+         response.send(200);
+});
 
 app.post('/register', user.register);
 app.post('/authenticate', user.authenticate);
@@ -163,6 +202,7 @@ app.get('/invites/:invite_code', invitepage.getinvite);
 apiRoutes.get('/invited/:event_id', invites.invitedlist);
 
 apiRoutes.post('/addinvite/:event_id/', invites.addinvite); 
+apiRoutes.post('/subscribe', invites.subscribe); 
 apiRoutes.delete('/deleteinvite/:invite_id', invites.deleteinvite);
 apiRoutes.post('/addphone/:event_id/', invites.addphone); 
 apiRoutes.post('/addplan', invites.addplan); 

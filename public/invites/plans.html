@@ -1,8 +1,13 @@
-<div>
+<div ng-init="planstatus()"> 
+Your plan is {{ plan_name }}
+<br>
 Plans here
 <form>
-<button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('fred')">7 day trail</button>
-<button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('mary')">5 bucks month</button>
-<button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('sarah')">5 bucks month</button>
+<button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('fred')">fred 7 day trail</button>
+<button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('mary')">mary 5 bucks month</button>
+<button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('sarah')">sarah 10 bucks month</button>
+<button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('sarah')">buy more minutes</button>
+<button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('sarah')">buy another number</button>
+ <input type="button" value="Purchase" data-booking-id='3455' ng-click="open_stripe('mary')" class="btn btn-primary btn-sm"  >
 </form>
 </div>

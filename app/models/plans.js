@@ -8,6 +8,7 @@ module.exports = mongoose.model('Plan', new Schema({
     user_id: String,
     twilio_number_count: String,
     sms_count: String,
+    plan_name: String,
     days: String,
     start_time: {
         type: Date,

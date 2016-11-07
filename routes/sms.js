@@ -201,11 +201,12 @@ exports.sendcsvsms = function(req, res) {
 exports.planstatus = function(req, res){
     User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
         if (err) throw err;
-                        Plan.find({
-                               user_id: req.decoded._doc._id
-                            },
-                            function(err, plans) {
-                                if (err) throw err;
+                   Plan.find({
+                          user_id: req.decoded._doc._id
+                       },
+                       function(err, plans) {
+                           if (err) throw err;
+                   if (plans.length) {
                               
                         Messages.count({
                                user_phone: user.phone 
@@ -226,6 +227,12 @@ exports.planstatus = function(req, res){
                             });
                             });
                             });
+                   }else{
+                       res.json({
+                          success: true,
+                          message: 'No Plans Yet'
+                       })
+                   }
                             });
         });
 }

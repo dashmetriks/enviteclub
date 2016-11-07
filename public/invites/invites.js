@@ -142,7 +142,7 @@ angular.module('envite.invite', [
   })
 .controller('ModalInstanceCtrl', function ($scope,$rootScope, $uibModalInstance,FileUploader, items, Upload,$timeout) {
 
-
+/*
 var handler = StripeCheckout.configure({
   key: 'pk_test_auNQCyr5JRirAH46b4E0Gq9V',
   image: '/img/documentation/checkout/marketplace.png',
@@ -152,6 +152,7 @@ var handler = StripeCheckout.configure({
     // Get the token ID to your server-side code for use.
   }
 });
+*/
 
 //$('#customButton').on('click', function(e) {
 $scope.purchase = function() {
@@ -448,7 +449,10 @@ $scope.mytime = new Date();
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
-                });
+                })
+                .finally(function() {
+  console.log("finally finished repos");
+});
         };
 
 
@@ -634,6 +638,7 @@ $scope.mytime = new Date();
                     }
                 }).success(function(data) {
                     $scope.getEventList();
+                        $scope.planstatus(); 
                     $scope.showDeleteEvent = false;
                 })
                 .error(function(data) {
@@ -660,6 +665,7 @@ $scope.mytime = new Date();
 
         $scope.planstatus = function() {
             console.log('asdfadsf444');
+            $scope.plan_name = 0
             $http({
                     method: 'GET',
                     url: express_endpoint + '/api/planstatus/',
@@ -668,6 +674,11 @@ $scope.mytime = new Date();
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
+                    if (data.message == 'No Plans Yet') {
+                        $scope.create_plan = true; 
+                    }else{
+                        $scope.create_plan = false; 
+                    }
                     $scope.sms_count = data['plans'][0]['sms_count'];
                     $scope.twilio_number_count = data['plans'][0]['twilio_number_count'];
                     $scope.event_count = data['event_count'];
@@ -677,8 +688,12 @@ $scope.mytime = new Date();
                         $scope.create_more = false; 
                     }
                          
-                    console.log(data);
+                    console.log("create_plan=" + $scope.create_plan)
+                    console.log( "create_more=" + $scope.create_more)
+
                     $scope.plan_start_date = data['plans'][0]['start_time'];
+                    $scope.plan_name = 0
+                    $scope.plan_name = data['plans'][0]['plan_name'];
                     $scope.message_count = data['message_count'];
                     $scope.count_percent = (data['message_count'] / data['plans'][0]['sms_count'] ) * 100
                     
@@ -1139,6 +1154,7 @@ $scope.mytime = new Date();
                         delete $scope.formData.text
          //               delete $scope.formData.event_location
                         $scope.getEventList();
+                        $scope.planstatus(); 
                     })
                     .error(function(data) {
                         console.log('Error: ' + data);
@@ -1191,6 +1207,8 @@ $scope.mytime = new Date();
                 }).success(function(data) {
                    // $scope.eventEdit = 'NO';
                   //  $scope.getEvent();
+                      $scope.planstatus(); 
+               //       $scope.getEventList();
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
@@ -1311,42 +1329,64 @@ $scope.timers = [];
                     console.log('Error: ' + data);
                 });
         };
-
+    
+     
+        $scope.stripe_checkout = function(plan) {
+        //function stripe_checkout(plan) {
         var handler = StripeCheckout.configure({
-  key: 'pk_test_auNQCyr5JRirAH46b4E0Gq9V',
-  image: '/img/documentation/checkout/marketplace.png',
-  locale: 'auto',
-  token: function(token) {
-    console.log("Got Stripe token: " + token.id);
+            key: 'pk_test_auNQCyr5JRirAH46b4E0Gq9V',
+            image: '/img/documentation/checkout/marketplace.png',
+            locale: 'auto',
+            token: function(token,args) {
+            console.log("Got Stripe token: " + token.id);
             $http({
                     method: 'POST',
-                    url: express_endpoint + '/api/charge/',
-                    data: 'stripeToken=' + token.id + '&totalcharge=500' ,
+                  //  url: express_endpoint + '/api/charge/',
+                    url: express_endpoint + '/api/subscribe/',
+                    data: 'stripeToken=' + token.id + '&totalcharge=600' + '&plan=' + plan,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'x-access-token': $window.localStorage.getItem('token')
                     }
-                }).success(function(data) {
+                })
+                .success(function(data) {
                     console.log('success: ' + data);
+  console.log("finally 99999finished repos");
+                      $scope.planstatus(); 
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
-                });
-
-    // You can access the token ID with `token.id`.
-    // Get the token ID to your server-side code for use.
-  }
+                })
+ 
+                .finally(function() {
+  console.log("finally finished repos");
 });
+                    console.log("kdkdkkd  ddd")
+                      $scope.planstatus(); 
 
+            // You can access the token ID with `token.id`.
+            // Get the token ID to your server-side code for use.
+            }
+        });
+        return handler;
+     }
+ 
 
-        $scope.wtf = function(){
-           console.log("wtf");
+        $scope.open_stripe = function(plan){
+           console.log("open_stripe");
+           var booking_id = $(this).data('booking-id');
+           console.log(booking_id);
+           handler = $scope.stripe_checkout(plan);
+           console.log(handler)
            handler.open({
-    name: 'Demo Site',
-    description: '2 widgets',
-    amount: 2000
-  });
+             name: 'Demo Site',
+             plan: plan,
+             description: plan + ' plan',
+             amount: 2000
+           })
+           console.log("open stripe")
         };
+
         $scope.joinEvent = function(ustatus) {
             $http({
                     method: 'get',

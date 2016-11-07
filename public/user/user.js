@@ -144,12 +144,13 @@ angular.module('envite.user', ['ngRoute'])
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).success(function(data) {
-                    if (data.message == "User already exists.") {
-                        $scope.reg_message = "User already exists."
+                    //if (data.message == "User already exists.") {
+                    if (data.success == false) {
+                        $scope.reg_message = data.message 
                     }
                     if (data.success == true) {
                      //   $rootScope = $rootScope.$new(true);
-                        $rootScope.reg_message_success = "Thanks for registering. Please confirm your Display Name"
+                        $rootScope.reg_message_success = data.message 
                         $scope.login();
                     }
                 });

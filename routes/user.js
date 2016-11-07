@@ -26,8 +26,10 @@ var transporter = nodemailer.createTransport({
 app.set('superSecret', config.secret);
 
 exports.register = function(req, res) {
-    User.findOne({
-        username: req.body.name
+    User.find({
+  //      username: req.body.name
+       // phone: req.body.phone
+        $or:[ {'username':req.body.name}, {'phone':req.body.phone},  ]
     }, function(err, user) {
 
         if (err)
@@ -60,14 +62,15 @@ exports.register = function(req, res) {
                     });
 
                 res.json({
-                    success: true
+                    success: true,
+                    message: 'Please check your phone for confirmation code'
                 });
             });
 
         } else if (user) {
             res.json({
                 success: false,
-                message: 'User already exists.'
+                message: 'User with that phone number or email already exists - Please login'
             });
 
         }
