@@ -45,6 +45,10 @@ angular.module('envite.invite', [
             templateUrl: 'invites/sms_group_list.html',
             controller: 'invitesController'
         })
+        .when('/start', {
+            templateUrl: 'invites/start.html',
+            controller: 'invitesController'
+        })
         .when('/plans', {
             templateUrl: 'invites/plans.html',
             controller: 'invitesController'
