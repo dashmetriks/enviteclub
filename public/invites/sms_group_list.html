@@ -1,12 +1,5 @@
 <section>
-<p>
-    <input type="text" placeholder="Search..." ng-model="searchFor" size="20" />
-</p>
-<!--
-<div class="row">
-  <div class="col-sm-6 col-md-4" ng-init="planstatus()" >
--->
-<div>
+<div class="container">
     <div ng-init="planstatus()">
         <div class="col-sm-5 col-md-5" ng-hide="create_plan">
             Your plan is {{ plan_name }}
@@ -23,8 +16,8 @@
         </div>
         <div class="col-sm-7 col-md-7">
        <!-- <div ng-show="create_plan"> -->
-            select plan to get started Your plan is {{ plan_name }}
-            <br> Plans here
+            Please select plan to get started: 
+            <br> 
             <div class="row">
                 <div class="col-lg-10 col-md-10 col-sm-10">
                     <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 1">
@@ -59,9 +52,7 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div>
+        </div>
     <div ng-controller="invitesController" ng-init="getEventList()">
         <div ng-hide="create_more || create_plan">
         </div>
