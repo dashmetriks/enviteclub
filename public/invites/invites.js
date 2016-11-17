@@ -45,6 +45,10 @@ angular.module('envite.invite', [
             templateUrl: 'invites/sms_group_list.html',
             controller: 'invitesController'
         })
+        .when('/twilio_numbers', {
+            templateUrl: 'invites/twilio_numbers.html',
+            controller: 'invitesController'
+        })
         .when('/start', {
             templateUrl: 'invites/start.html',
             controller: 'invitesController'
@@ -386,6 +390,24 @@ $scope.mytime = new Date();
 
  };
 })
+
+.filter('ptext', function($filter)
+{
+ return function(input,frmt)
+ {
+  if(input == null){ return ""; } 
+  
+  var reply_text = {"1":"7 Day Trial - 100 texts - 1 group", "2":"$10/month - 500 texts - 1 group", "3":"$20/month - 1000 texts - 2 groups"}
+ 
+  if (frmt == 'sdate'){ 
+   var _date = reply_text[input] 
+  }
+ 
+  return _date;
+
+ };
+})
+
 //.controller('invitesController', ['$scope','$http', '$window', '$location', '$routeParams', '$rootScope', 'FileUploader', 
 .controller('invitesController', 
     function($scope,   $http, $window, $location, $routeParams, $rootScope , FileUploader, $uibModal) {
@@ -469,7 +491,8 @@ $scope.mytime = new Date();
         $scope.formData1 = {};
         $scope.fields = {
             password: '',
-            passwordConfirm: ''
+            passwordConfirm: '',
+            confirmphone: ''
         };
 
         $scope.submitForm = function(isValid) {
@@ -614,6 +637,21 @@ $scope.mytime = new Date();
                 });
         }
 
+        $scope.addtextgroup_confirm = function() {
+            if ($scope.showAddTextGroup == true) {
+                $scope.showAddTextGroup = false;
+            } else {
+                $scope.showAddTextGroup = true;
+            }
+        };
+        $scope.upgrade_confirm = function() {
+            if ($scope.showUpgradePlan == true) {
+                $scope.showUpgradePlan = false;
+            } else {
+                $scope.showUpgradePlan = true;
+            }
+        };
+
         $scope.deleteEventConfirm = function(id) {
             if ($scope.showDeleteEvent == true) {
                 $scope.showDeleteEvent = false;
@@ -685,6 +723,7 @@ $scope.mytime = new Date();
                     }
                     $scope.sms_count = data['plans'][0]['sms_count'];
                     $scope.twilio_number_count = data['plans'][0]['twilio_number_count'];
+                    $scope.number_add_on = data['plans'][0]['number_add_on'];
                     $scope.event_count = data['event_count'];
                     if (data['event_count'] < data['plans'][0]['twilio_number_count']){
                         $scope.create_more = true; 
@@ -699,7 +738,7 @@ $scope.mytime = new Date();
                     $scope.plan_name = 0
                     $scope.plan_name = data['plans'][0]['plan_name'];
                     $scope.message_count = data['message_count'];
-                    $scope.count_percent = (data['message_count'] / data['plans'][0]['sms_count'] ) * 100
+                    $scope.count_percent = Math.round((data['message_count'] / data['plans'][0]['sms_count'] ) * 100)
                     
                   
                    var myDate = +new Date($scope.plan_start_date)
@@ -714,6 +753,40 @@ $scope.mytime = new Date();
                 .error(function(data) {
                     $scope.showLoginToInvite = true;
                     console.log('Error: ' + data);
+                });
+        }
+
+        $scope.get_twilio_numbers = function() {
+            $http({
+                    method: 'GET',
+                    url: express_endpoint + '/api/get_twilio_numbers/',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                  console.log(data['twilio_numbers'])
+                  $scope.numbers_list = data['twilio_numbers']
+                })
+                .error(function(data) {
+                });
+        }
+        $scope.add_twilio_number = function() {
+            console.log($scope.formData.email)
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/add_twilio_number/',
+                    data: 'twilio_number=' + $scope.formData.email,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                  $scope.get_twilio_numbers();
+                  //console.log(data['twilio_numbers'])
+                  //$scope.numbers_list = data['twilio_numbers']
+                })
+                .error(function(data) {
                 });
         }
 
@@ -995,6 +1068,7 @@ $scope.mytime = new Date();
                         $rootScope.isEventCreator = true;
                         $rootScope.isMember = true;
                     }
+                    console.log("event creator:" +  $rootScope.isEventCreator)
                 })
                 .error(function(data) {
                     console.log('Error: ' + data);
@@ -1219,6 +1293,46 @@ $scope.mytime = new Date();
                 });
         };
 
+        $scope.upgrade_plan = function(plan_type) {
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/upgradeplan/',
+                    data: 'plan_type=' + plan_type, 
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                   // $scope.eventEdit = 'NO';
+                  //  $scope.getEvent();
+                      $scope.planstatus(); 
+               //       $scope.getEventList();
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
+
+        $scope.addtextgroup = function(count1) {
+            $http({
+                    method: 'POST',
+                    url: express_endpoint + '/api/addtextgroup/',
+                    data: 'count=' + count1, 
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'x-access-token': $window.localStorage.getItem('token')
+                    }
+                }).success(function(data) {
+                   // $scope.eventEdit = 'NO';
+                      $scope.showAddTextGroup = false;
+                      $scope.planstatus(); 
+               //       $scope.getEventList();
+                })
+                .error(function(data) {
+                    console.log('Error: ' + data);
+                });
+        };
+
 
         $scope.editEventSave = function() {
             $http({
@@ -1377,16 +1491,18 @@ $scope.timers = [];
  
 
         $scope.open_stripe = function(plan){
+           var plan_text = {"2":"$10/month", "3":"$20/month"}
+           var plan_cost = {"2":"1000", "3":"2000"}
            console.log("open_stripe");
            var booking_id = $(this).data('booking-id');
            console.log(booking_id);
            handler = $scope.stripe_checkout(plan);
            console.log(handler)
            handler.open({
-             name: 'Demo Site',
+             name: 'EZ GroupText',
              plan: plan,
-             description: plan + ' plan',
-             amount: 2000
+             description: plan_text[plan] + ' plan',
+             amount: plan_cost[plan]
            })
            console.log("open stripe")
         };

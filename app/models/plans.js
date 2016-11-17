@@ -6,7 +6,10 @@ myDate.setTime(myDate.getTime() - dateOffset);
 
 module.exports = mongoose.model('Plan', new Schema({
     user_id: String,
+    stripe_customer_id: String,
+    subscription_id: String,
     twilio_number_count: String,
+    number_add_on: {type:String, default: 0},
     sms_count: String,
     plan_name: String,
     days: String,

@@ -31,11 +31,12 @@ exports.register = function(req, res) {
        // phone: req.body.phone
         $or:[ {'username':req.body.name}, {'phone':req.body.phone},  ]
     }, function(err, user) {
+ 
 
         if (err)
             throw err;
 
-        if (!user) {
+        if (user.length < 1) {
             var newuser = new User({
                 username: req.body.name,
                 phone: req.body.phone,

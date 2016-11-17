@@ -24,7 +24,6 @@ a.active {
 h1,
 h2,
 h3,
-h4,
 h5,
 h6 {
   font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -69,8 +68,9 @@ hr.star-primary:after {
 }
 header {
   text-align: center;
-  background: #18BC9C;
-  color: white;
+//  background: #18BC9C;
+  background: white;
+  color: blue;
 }
 header .container {
   padding-top: 100px;
@@ -93,7 +93,7 @@ header .intro-text .skills {
 }
 @media (min-width: 768px) {
   header .container {
-    padding-top: 200px;
+    padding-top: 80px;
     padding-bottom: 100px;
   }
   header .intro-text .name {

@@ -58,7 +58,7 @@ exports.invitedlist = function(req, res) {
         });
 }
 
-function add_plan(req, plan_type){
+function add_plan(req, plan_type, stripe_customer_id, subscription_id){
 
   var planobj = { 
     1: { twilio_number_count: 1, sms_count: 100, days: 7, melons: 0 }, 
@@ -69,7 +69,6 @@ function add_plan(req, plan_type){
      if (err) throw err;
    Plan.find({ user_id: req.decoded._doc._id }, function(err, existing_plan) {
      if (existing_plan.length) {
-       console.log('plan already exists ----------------')
         Plan.update({
             user_id: req.decoded._doc._id,
         }, {
@@ -81,13 +80,14 @@ function add_plan(req, plan_type){
             }
         },
         function(err, result) {
-            if (err)
-                throw err;
+            if (err) throw err;
          return result;
         });
      } else {
        Plan.create({
             user_id: req.decoded._doc._id,
+            stripe_customer_id: stripe_customer_id, 
+            subscription_id: subscription_id, 
             twilio_number_count: planobj[plan_type]['twilio_number_count'], 
             sms_count: planobj[plan_type]['sms_count'], 
             plan_name: plan_type, 
@@ -97,9 +97,6 @@ function add_plan(req, plan_type){
          if (err) throw err;
          console.log(plans)
          return plans;
-//                            res.json({
- //                               'plans': plans
-  //                          });
        });
       }
     });
@@ -130,6 +127,97 @@ console.log(req.body.plan_type)
                                 'plans': plans
                             });
                             });
+        });
+}
+
+exports.upgradeplan = function(req, res){
+console.log('odododo')
+var plan_name = {"1":"10month", "2":"20month"}
+var planobj = { 
+    1: { twilio_number_count: 1, sms_count: 100, days: 7, melons: 0 }, 
+    2: { twilio_number_count: 1, sms_count: 500, days: 30, melons: 0 }, 
+    3: { twilio_number_count: 2, sms_count: 1000, days: 30, melons: 0 } 
+}
+var plan_type = req.body.plan_type
+    User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+        if (err) throw err;
+   Plan.find({ user_id: req.decoded._doc._id }, function(err, existing_plan) {
+     if (existing_plan.length) {
+        stripe.subscriptions.update(
+             existing_plan.subscription_id,
+              { plan: plan_name[plan_type] },
+            function(err, subscription) {
+                 console.log(subscription)
+        Plan.update({
+            user_id: req.decoded._doc._id,
+        }, {
+            $set: {
+              twilio_number_count: planobj[plan_type]['twilio_number_count'] + existing_plan[0]['number_add_on'], 
+              sms_count: planobj[plan_type]['sms_count'], 
+              plan_name: plan_type, 
+              days: planobj[plan_type]['days'] 
+            }
+        },
+        function(err, result) {
+            if (err) throw err;
+                            res.json({
+                                'plans': result
+                            });
+        });
+        }
+         );
+     } 
+    });
+        });
+}
+exports.addtextgroup = function(req, res){
+console.log('odododo')
+var plan_name = {"1":"10month", "2":"20month"}
+var planobj = { 
+    1: { twilio_number_count: 1, sms_count: 100, days: 7, melons: 0 }, 
+    2: { twilio_number_count: 1, sms_count: 500, days: 30, melons: 0 }, 
+    3: { twilio_number_count: 2, sms_count: 1000, days: 30, melons: 0 } 
+}
+var plan_type = req.body.plan_type
+    User.findOne({ _id: req.decoded._doc._id }, function(err, user) {
+        if (err) throw err;
+   Plan.find({ user_id: req.decoded._doc._id }, function(err, existing_plan) {
+     if (existing_plan.length) {
+         var new_count = existing_plan[0]['twilio_number_count'] ++ 
+         console.log("new ---------")
+         console.log( existing_plan[0]['twilio_number_count'])
+         console.log( new_count)
+         var number_add_on = existing_plan[0]['number_add_on']
+         if (existing_plan[0]['number_add_on'] == 0){
+            number_add_on = 1
+         }else{
+            number_add_on++
+         }
+      //  stripe.subscriptions.update(
+       //      existing_plan.subscription_id,
+        //      { plan: plan_name[plan_type] },
+         //   function(err, subscription) {
+          //       console.log(subscription)
+        Plan.update({
+            user_id: req.decoded._doc._id,
+        }, {
+            $set: {
+              twilio_number_count: existing_plan[0]['twilio_number_count'] ++ ,
+              number_add_on: number_add_on 
+            //  sms_count: planobj[plan_type]['sms_count'], 
+             // plan_name: plan_type, 
+              //days: planobj[plan_type]['days'] 
+            }
+        },
+        function(err, result) {
+            if (err) throw err;
+                            res.json({
+                                'plans': result
+                            });
+        });
+      //  });
+     } 
+    });
         });
 }
 
@@ -242,24 +330,30 @@ exports.deleteinvite = function(req, res) {
 }
 
 exports.subscribe = function(req, res) {
+var plan_name = {"1":"10month", "2":"20month"}
 
         console.log("weeeeeee")
+        console.log(req.body)
 	var stripeToken = req.body.stripeToken;
 	var totalcharge = req.body.totalcharge;
 	var plan = req.body.plan;
-               console.log(plan)
+        console.log(plan_name[plan])
 
 	var charge = stripe.customers.create({
 		source: stripeToken,
-		plan: "sarah",
-		email: "payinguser3@example.com"
+	//	plan: plan_name[plan],
+		plan: "10month",
+		email: "sweeeeet@example.com"
 	}, function(err, customer) {
 		if (err && err.type === 'StripeCardError') {
                console.log("err")
 			// The card has been declined
 		} else {
-               console.log(customer)
-               add_plan(req, plan, function(data) {
+               console.log("sadfaksdkkkkk ------------")
+               console.log(customer['subscriptions']['data'][0]['id'])
+              // console.log(customer['subscriptions']['data'][0])
+               console.log("uuuuuuuuuuu ------------")
+               add_plan(req, plan,customer['id'],customer['subscriptions']['data'][0]['id'], function(data) {
              //   res.json({
               //      success: true,
               //  });

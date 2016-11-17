@@ -1,9 +1,13 @@
 <section>
     <div class="container">
-        <div ng-init="planstatus()">
+        <div ng-init="planstatus()"> 
             <div class="col-sm-5 col-md-5" ng-hide="create_plan">
-                Your plan is {{ plan_name }}
-                <br> {{message_count}} / {{ sms_count}} texts
+            <div class="panel panel-info">
+            
+                <div class="panel-heading">Current plan:{{ plan_name | ptext:'sdate' }}
+                <div ng-if="number_add_on > 0">+ {{ number_add_on}} group addons</div></div>
+                <div class="panel-body">
+                 {{message_count}} / {{ sms_count}} texts
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" aria-valuenow="{{ count_percent}}" aria-valuemin="0" aria-valuemax="100" style="width:{{ count_percent}}%"> {{count_percent}}%
                     </div>
@@ -13,50 +17,79 @@
                     <div class="progress-bar" role="progressbar" aria-valuenow="{{ day_percent}}" aria-valuemin="0" aria-valuemax="100" style="width:{{ day_percent}}%"> {{day_percent}}%
                     </div>
                 </div>
+              </div>
+              </div>
             </div>
-            <div class="col-sm-7 col-md-7">
+            <div class="col-sm-6 col-md-6">
+              <div class="panel panel-info">
                 <!-- <div ng-show="create_plan"> -->
+                <div ng-if="plan_name < 1" class="panel-heading">
                 Please select plan to get started:
-                <br>
-                <div class="row">
+                </div>
+                <div ng-if="plan_name == 1" class="panel-heading">
+                Paid Plans:
+                </div>
+                <div ng-if="plan_name >= 2" class="panel-heading">
+                More Plans / Add ons:
+                </div>
+                <div class="row panel-body">
                     <div class="col-lg-10 col-md-10 col-sm-10">
                         <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 1">
                             <div style="padding-left:10px; padding-bottom:10px ;padding-top:10px ">
-                                <button type="submit" class="btn btn-primary btn-sm" ng-click="createplan('1')">Free 7 day trail</button>
+                                <button type="submit" class="btn btn-success btn-sm" ng-click="createplan('1')">Free 7 day trail</button>
                                 <br> 100 texts
                                 <br> 1 SMS Group
                             </div>
                         </div>
                         <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 2">
                             <div style="padding-bottom:10px ;padding-top:10px ">
-                                <button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('2')">$5 month</button>
+                                <button type="submit" class="btn btn-success btn-sm" ng-click="open_stripe('2')">$10 month</button>
                                 <br> 500 texts
                                 <br> 1 SMS Group
                                 <br>
                             </div>
                         </div>
-                        <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 3">
+                        <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 2">
                             <div style="padding-bottom:10px ;padding-top:10px ">
-                                <button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('3')">$10 month</button>
+                                <button type="submit" class="btn btn-success btn-sm" ng-click="open_stripe('3')">$20 month</button>
                                 <br> 1000 texts
                                 <br> 2 SMS Groups
                             </div>
                         </div>
-                        <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name > 1">
+                        <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name == 2">
                             <div style="padding-bottom:10px ;padding-top:10px ">
-                                <button type="submit" class="btn btn-primary btn-sm" ng-click="open_stripe('3')">$1 month</button>
-                                <br> Purchase additional groups
-                                <br>
+                        <button type="submit" class="btn btn-success" ng-click="upgrade_confirm()">Upgrade Plan</button>
+                            <div ng-show="showUpgradePlan">
+                                Confirm upgrade to $20 per month
+                                <button type="submit" class="btn btn-warning btn-sm" ng-click="upgrade_plan('3')" >$20 month</button>
+                            </div>
+                                <br> $20/month 
+                                <br> 1000 texts
+                                <br> 2 SMS Groups
+                            </div>
+                        </div>
+                        <div style="width: 135px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name > 1">
+                            <div style="padding-bottom:10px ;padding-top:10px ">
+                        <button type="submit" class="btn btn-success" ng-click="addtextgroup_confirm()">Add SMS Group</button>
+                            <div ng-show="showAddTextGroup">
+                                Confirm adding SMS group $1/month
+                                <button type="submit" class="btn btn-warning btn-sm" ng-click="addtextgroup(1)" >$1 month</button>
+                            </div>
+                                 $1 per Group 
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div ng-controller="invitesController" ng-init="getEventList()">
-            <div ng-hide="create_more || create_plan">
-            </div>
-            <div class="col-sm-4 col-md-4 col-lg-4" ng-hide="create_plan">
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+        <div ng-controller="invitesController" ng-init="getEventList()" class="container">
+            <div ng-hide="create_more || create_plan"> </div> 
+            <div class="col-sm-3 col-md-3 col-lg-3" ng-hide="create_plan">
+            <div class="panel panel-info" >
+                <div class="panel-heading">New Groups</div>
+                <div class="panel-body">
                 <form name="form.myForm2">
                     <input type="text" class="form-control input-md text-center" name="addGroup" placeholder="Create New Text Group" ng-model="formData.text" required>
                     <label>
@@ -64,10 +97,10 @@
                     </label>
                     <br/>
                     <label>
-                        <input type="radio" ng-model="reply.value" value="reply_me"> Reply Me {{ twilio_number_count }} {{ event_count }}
+                        <input type="radio" ng-model="reply.value" value="reply_me"> Reply Me 
                     </label>
                     <br/>
-                    <div ng-hide="create_more" ng-if="plan_name < 2">
+                   <div ng-hide="create_more" ng-if="plan_name < 2"> 
                         <div class="panel panel-default">
                             <div class="panel-body">
                                 Upgrade to create more groups
@@ -86,8 +119,11 @@
                     </div>
                 </form>
             </div>
+            </div>
+            </div>
+         <!--   <div ng-init="getEventList()" class="col-sm-8 col-md-8 col-lg-8"> -->
             <div class="col-sm-8 col-md-8 col-lg-8">
-                <div style="width: 200px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
+                <div style="width: 250px; float: left; margin-right: 10px; padding:3px" ng-repeat="event in events | filter: { event_title: searchFor } | orderBy:'-_id'" class="panel panel-default">
                     <div style="padding-left:10px; padding-bottom:10px">
                         <h4><a href='/sms_group/{{ event._id }}'> {{ event.event_title}} </a>  </h4>
                         <h4>Texts Sent: {{ events_comments_count[0][event._id] }} </h4>
@@ -98,8 +134,8 @@
                         <div class="box" ng-show="events_comments_count[0][event._id] > 0">
                             Last Text: <span ng-init="setthetime(events_last_comment[0][event._id]['_id'], events_last_comment[0][event._id]['created_at'])"><timer ng-repeat="timer in timers | filter:{ invite_code: events_last_comment[0][event._id]['_id'] }  track by $index"> </timer></span>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-xs" ng-if="logged_in_userid == event.event_creator" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
-                        <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
+                        <button type="submit" class="btn btn-warning btn-xs" ng-if="logged_in_userid == event.event_creator" ng-click="deleteEventConfirm(event._id)">Delete Event</button>
+                        <button type="submit" class="btn btn-danger btn-xs" ng-show="showDeleteEvent && showDeleteEventid == event._id" ng-click="deleteEvent(event._id)">Confirm Delete</button>
                     </div>
                 </div>
             </div>

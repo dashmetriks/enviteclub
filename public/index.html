@@ -9,7 +9,7 @@
     <base href="/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Optimize mobile viewport -->
-    <title>Envite</title>
+    <title>EZ GroupText</title>
     <!-- SCROLLS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
     <!-- load bootstrap -->
@@ -36,7 +36,7 @@
     <script src="https://code.angularjs.org/1.2.6/angular.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-route.min.js"></script>
    -->
- <link href="css/freelancer.min.css" rel="stylesheet">
+ <link href="css/freelancer.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -65,7 +65,7 @@
 <!-- SET THE CONTROLLER AND GET ALL TODOS -->
 
 <body class="index">
-    <div ng-controller="invitesController as ctrl"  >
+    <div ng-controller="userController as ctrl" ng-init="check_user()" >
 <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -73,7 +73,7 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="#page-top">Start Bootstrap</a>
+                <a class="navbar-brand" href="/start">EZ Grouptext</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -83,14 +83,14 @@
                         <a href="#page-top"></a>
                     </li>
                     <li class="page-scroll">
-                        <a href="#portfolio">Portfolio</a>
+                        <a href="/start#pricing">Pricing</a>
                     </li>
-                    <li class="page-scroll">
-                        <a href="#about">About</a>
+                    <li class="page-scroll" ng-show="isUserLoggedIn">
+                        <a href="/my_group_sms">Dashboard</a>
                     </li>
-                    <li class="page-scroll">
-                        <a href="#contact">Contact</a>
-                    </li>
+                     <li ng-show="isUserLoggedIn"><a href="/#/user"> Account </a></li>
+                     <li ng-hide="isUserLoggedIn"><a href="/#/login" > Login </a></li>
+                     <li ng-show="isUserLoggedIn"><a href="" ng-click="logOut()"> Logout </a></li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->

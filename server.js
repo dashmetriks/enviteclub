@@ -206,10 +206,14 @@ apiRoutes.post('/subscribe', invites.subscribe);
 apiRoutes.delete('/deleteinvite/:invite_id', invites.deleteinvite);
 apiRoutes.post('/addphone/:event_id/', invites.addphone); 
 apiRoutes.post('/addplan', invites.addplan); 
+apiRoutes.post('/upgradeplan', invites.upgradeplan); 
+apiRoutes.post('/addtextgroup', invites.addtextgroup); 
 apiRoutes.post('/sendsms/:event_id/', sms.sendsms);
 app.get('/smsdata', sms.smsdata);
 apiRoutes.get('/planstatus', sms.planstatus);
+apiRoutes.get('/get_twilio_numbers', sms.get_twilio_numbers);
 apiRoutes.post('/sendcsvsms', sms.sendcsvsms);
+apiRoutes.post('/add_twilio_number', sms.add_twilio_number);
 
 app.use('/api', apiRoutes);
 app.use(function(req, res) {

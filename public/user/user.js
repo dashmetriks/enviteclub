@@ -44,7 +44,17 @@ angular.module('envite.user', ['ngRoute'])
             $scope.showRegToInvite = false;
             $scope.showLoginToInvite = true;
         }
-
+   
+        $scope.check_user = function() {
+            if ($window.localStorage.getItem('token') == null) {
+                $rootScope.showLoginlink = true;
+            } else if ($window.localStorage.getItem('token').length < 10) {
+                $rootScope.showLoginlink = true;
+            } else {
+                $rootScope.isUserLoggedIn = true;
+                $scope.checkLogin();
+            }
+        } 
 
         $scope.loginForm = function() {
             $rootScope.showLoginlink = false;
@@ -82,16 +92,18 @@ angular.module('envite.user', ['ngRoute'])
                 });
             }
         }
+        $scope.user = {confirmphone: '', last: 'visitor'};
 
         $scope.save_phone_confirmation = function() {
+            console.log($scope.user.confirmphone)
             $scope.submitted = true;
-            if ($scope.fields.confirmphone.length < 1) {
+            if ($scope.user.confirmphone.length < 1) {
                 $scope.noPassword = true;
             } else {
                 $http({
                     method: 'POST',
                     url: express_endpoint + '/api/confirmphone',
-                    data: '&confirmphone=' + $scope.fields.confirmphone,
+                    data: '&confirmphone=' + $scope.user.confirmphone,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'x-access-token': $window.localStorage.getItem('token')

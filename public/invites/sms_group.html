@@ -1,16 +1,17 @@
+<section>
     <div class="container" ng-init="getEvent()" ng-controller="invitesController" ng-show="isEventCreator">
       <!--  <input type="button" value="Purchase" ng-click="wtf()" class="btn btn-primary btn-sm"  > -->
         <!-- HEADER AND TODO COUNT -->
         <div class="row">
             <div class="col-sm-5">
                 <div class="well text-left" ng-if="eventEdit != 'YES'">
-                    <h4>Group Name: {{ event_data.event_title}}</h4>
-                    <h4>SMS number: {{event_data.event_twilio_number}} </h4>
-                    <h4>Reply Setting: {{event_data.event_reply_setting | rtext:'sdate'}} </h4>
+                    <h4><b>Group Name:</b> {{ event_data.event_title}}</h4>
+                    <h4><b>SMS number:</b> {{event_data.event_twilio_number}} </h4>
+                    <h4><b>Reply Setting:</b> {{event_data.event_reply_setting | rtext:'sdate'}} </h4>
                     <label ng-if="isUserLoggedIn">
                         <div ng-repeat="user in players_list">
                             <span ng-if="invite_code == user.invite_code && event_creator_id == user.user_id">
-                    <input type="button" value="Edit Event" ng-click="editEvent()" class="btn btn-primary btn-sm"  >
+                    <input type="button" value="Edit Event" ng-click="editEvent()" class="btn btn-info btn-sm"  >
                         </span>
                         </div>
                     </label>
@@ -39,7 +40,7 @@
                     </form>
                 </div>
                 <div ng-if="isMember" class="well">
-                <form class="form-inline">
+                <form class="form-inline" name="myForm">
                   <div class="form-group">
                      <label for="disp">&nbsp;Name:</label>
                          <input type="text" id="disp" name="displayname" class="form-control input-sm text-center" placeholder="name" ng-model="formData.text" required>
@@ -47,7 +48,7 @@
                   <div class="form-group">
                                 <label for="phone">Phone:</label>
                                 <input type="text" name="username" id="phone" class="form-control input-sm text-center" placeholder="4157771234" ng-model="formData.email" required>
-                                <button type="submit" ng-disabled="myForm.displayname.$invalid ||  myForm.username.$invalid" class="btn btn-default" ng-click="addPhone()">Add User</button>
+                                <button type="submit" ng-disabled="myForm.displayname.$invalid ||  myForm.username.$invalid" class="btn btn-success btn-sm" ng-click="addPhone()">Add User</button>
                             </div>
                         </form>
                 </div>
@@ -66,8 +67,8 @@
                     <td>{{ x.invited_phone}}</td>
                     <td>{{ x.invite_status}}</td>
                     <td>
-<button type="submit" class="btn btn-primary btn-xs" ng-click="delete_sms_user_confirm(x._id)">Delete User</button>
-           <button type="submit" class="btn btn-primary btn-xs" ng-show="showDeleteEvent && showDeleteEventid == x._id" ng-click="delete_sms_user(x._id)">Confirm Delete</button></td>
+<button type="submit" class="btn btn-warning btn-xs" ng-click="delete_sms_user_confirm(x._id)">Delete User</button>
+           <button type="submit" class="btn btn-danger btn-xs" ng-show="showDeleteEvent && showDeleteEventid == x._id" ng-click="delete_sms_user(x._id)">Confirm Delete</button></td>
                 </tr>
             </table>
         </div>
@@ -186,7 +187,7 @@
             </div>
             <div class="col-sm-5">
 <div>
-                        <form>
+                        <form name="smsForm">
                         <label>Message to be sent</label>
                                 <input type="text"  name="message" class="form-control input-sm text-center" placeholder="message" ng-model="formData.message" required>
         <div role="alert">
@@ -196,7 +197,7 @@
 
                          <!--   <button type="submit"  ng-disabled="(myForm.displayname.$pristine && myForm.displayname.$invalid) && (myForm.username.$pristine && myForm.username.$invalid)" class="btn btn-primary btn-sm" ng-click="addInvite()">Invite</button> -->
 
-                            <button type="submit"   class="btn btn-primary btn-sm" ng-click="sendSMS()">Send text</button><br><small> First time users will receive message saying "Reply GETOUT to leave Group" </small> 
+                            <button type="submit"   class="btn btn-success btn-sm" ng-click="sendSMS()" ng-disabled="smsForm.message.$invalid" >Send Text</button><br><small> First time users will receive message saying "Reply GETOUT to leave Group" </small> 
                         </form>
                             </div>
                 <h3>Texts </h3>
@@ -207,3 +208,4 @@
             </div>
         </div>
     </div>
+</section>

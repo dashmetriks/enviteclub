@@ -1,0 +1,15 @@
+<section>
+<div  ng-controller="invitesController" ng-init="get_twilio_numbers()">
+   <div class="container">
+    <div ng-repeat="sms_number in numbers_list">
+              {{sms_number.twilio_number}}
+              {{sms_number.number_status}}
+    </div>
+<form>
+                                <input type="text" name="twilio" id="twilio" class="form-control input-sm text-center" placeholder="4157771234" ng-model="formData.email" required>
+                                <button type="submit"  class="btn btn-success btn-sm" ng-click="add_twilio_number()">Add Twilio Number</button>
+</form>
+    </div>
+</div>
+</section>
+

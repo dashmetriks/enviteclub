@@ -47,8 +47,8 @@
                     <!-- password1 -->
                     <div class="form-group" ng-class="{ 'has-error' : userForm.confirmphone.$invalid &&  submitted }">
                         <label>Confirmation Code</label>
-                        <input id="confirmphone" name="confirmphone" ng-model="fields.confirmphone" class="form-control" required type="text" />
-                        <p ng-show="(userForm.confirmphone.$invalid && submitted)" class="help-block">Password is required.</p>
+                        <input id="confirmphone" name="confirmphone" ng-model="user.confirmphone" class="form-control" required type="text" />
+                        <p ng-show="(userForm.confirmphone.$invalid && submitted)" class="help-block">Conf code is required.</p>
                     </div>
                     <!-- password2 -->
                     <input type="button" ng-disabled="(userForm.$invalid && submitted)" value="Submit" ng-click="save_phone_confirmation()" class="btn btn-primary" />

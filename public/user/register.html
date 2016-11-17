@@ -6,7 +6,7 @@
                 <form name="userForm" class="well">
                     <!-- EMAIL -->
                     <div class="form-group" ng-class="{ 'has-error' : userForm.username.$invalid &&  submitted }">
-                        <label>Phone</label>
+                        <label>Phone-<i>  a text will be sent this number to confirm account</i></label>
                         <input type="text" class="form-control" name="phone" ng-model="user.phone" required/>
                         <p ng-show="userForm.phone.$invalid && submitted" class="help-block">Provide Valid Phone.</p>
                     </div>
