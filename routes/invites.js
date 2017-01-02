@@ -4,7 +4,7 @@ var User = require('../app/models/user');
 var config = require('../config');
 var crypto = require('crypto');
 var Event = require('../app/models/events');
-var stripe = require("stripe")("sk_test_bHQ01Hnro6LK3iNsx0r6JBs2");
+var stripe = require("stripe")(config.stripe_token);
 
 var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({

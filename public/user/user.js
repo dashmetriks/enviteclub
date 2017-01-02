@@ -32,7 +32,7 @@ angular.module('envite.user', ['ngRoute'])
         $scope.logOut = function() {
             $window.localStorage['token'] = null;
             $rootScope.isUserLoggedIn = false;
-            $location.url('/all_events');
+            $location.url('/start');
         }
 
         $scope.display_reg_form = function() {

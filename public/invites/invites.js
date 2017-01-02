@@ -49,7 +49,11 @@ angular.module('envite.invite', [
             templateUrl: 'invites/twilio_numbers.html',
             controller: 'invitesController'
         })
-        .when('/start', {
+        .when('/pricing', {
+            templateUrl: 'invites/start.html',
+            controller: 'invitesController'
+        })
+        .when('/', {
             templateUrl: 'invites/start.html',
             controller: 'invitesController'
         })
@@ -397,7 +401,7 @@ $scope.mytime = new Date();
  {
   if(input == null){ return ""; } 
   
-  var reply_text = {"1":"7 Day Trial - 100 texts - 1 group", "2":"$10/month - 500 texts - 1 group", "3":"$20/month - 1000 texts - 2 groups"}
+  var reply_text = {"1":"7 Day Trial - 100 text credits - 1 group", "2":"$10/month - 500 text credits - 1 group", "3":"$20/month - 1000 text credits - 2 groups"}
  
   if (frmt == 'sdate'){ 
    var _date = reply_text[input] 
@@ -644,6 +648,13 @@ $scope.mytime = new Date();
                 $scope.showAddTextGroup = true;
             }
         };
+        $scope.day7confirm = function() {
+            if ($scope.show7day == true) {
+                $scope.show7day = false;
+            } else {
+                $scope.show7day = true;
+            }
+        };
         $scope.upgrade_confirm = function() {
             if ($scope.showUpgradePlan == true) {
                 $scope.showUpgradePlan = false;
@@ -737,8 +748,10 @@ $scope.mytime = new Date();
                     $scope.plan_start_date = data['plans'][0]['start_time'];
                     $scope.plan_name = 0
                     $scope.plan_name = data['plans'][0]['plan_name'];
-                    $scope.message_count = data['message_count'];
-                    $scope.count_percent = Math.round((data['message_count'] / data['plans'][0]['sms_count'] ) * 100)
+                    $scope.message_count = data['message_sms'] + (2 * data['message_mms']);
+                    $scope.sms_message_count = data['message_sms'];
+                    $scope.mms_message_count = data['message_mms'];
+                    $scope.count_percent = Math.round(((data['message_sms'] + (2 * data['message_mms'])) / data['plans'][0]['sms_count'] ) * 100)
                     
                   
                    var myDate = +new Date($scope.plan_start_date)
@@ -832,6 +845,7 @@ $scope.mytime = new Date();
                         'x-access-token': $window.localStorage.getItem('token')
                     }
                 }).success(function(data) {
+                    console.log(data)
                     console.log(data['comments_count'])
               //      $scope.timers = [];
               //       

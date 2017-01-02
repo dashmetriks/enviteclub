@@ -4,10 +4,10 @@
             <div class="col-sm-5 col-md-5" ng-hide="create_plan">
             <div class="panel panel-info">
             
-                <div class="panel-heading">Current plan:{{ plan_name | ptext:'sdate' }}
+                <div class="panel-heading">Current plan: {{ plan_name | ptext:'sdate' }}
                 <div ng-if="number_add_on > 0">+ {{ number_add_on}} group addons</div></div>
                 <div class="panel-body">
-                 {{message_count}} / {{ sms_count}} texts
+                 {{message_count}} / {{ sms_count}} text credits ( sms={{sms_message_count}} mms={{mms_message_count}} )
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" aria-valuenow="{{ count_percent}}" aria-valuemin="0" aria-valuemax="100" style="width:{{ count_percent}}%"> {{count_percent}}%
                     </div>
@@ -36,15 +36,19 @@
                     <div class="col-lg-10 col-md-10 col-sm-10">
                         <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 1">
                             <div style="padding-left:10px; padding-bottom:10px ;padding-top:10px ">
-                                <button type="submit" class="btn btn-success btn-sm" ng-click="createplan('1')">Free 7 day trail</button>
-                                <br> 100 texts
+                        <button type="submit" class="btn btn-success btn-sm"  ng-click="day7confirm()">Free 7 day trial</button>
+                             <div  ng-show="show7day" >
+                                <br>
+                                <button type="submit" class="btn btn-primary btn-xs" ng-click="createplan('1')">Confirm 7 day trial</button>
+                             </div>
+                                     100 text credits
                                 <br> 1 SMS Group
                             </div>
                         </div>
                         <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 2">
                             <div style="padding-bottom:10px ;padding-top:10px ">
                                 <button type="submit" class="btn btn-success btn-sm" ng-click="open_stripe('2')">$10 month</button>
-                                <br> 500 texts
+                                <br> 500 text credits
                                 <br> 1 SMS Group
                                 <br>
                             </div>
@@ -52,7 +56,7 @@
                         <div style="width: 125px; float: left; margin-right: 10px; padding:3px" class="panel panel-default text-center" ng-if="plan_name < 2">
                             <div style="padding-bottom:10px ;padding-top:10px ">
                                 <button type="submit" class="btn btn-success btn-sm" ng-click="open_stripe('3')">$20 month</button>
-                                <br> 1000 texts
+                                <br> 1000 text credits
                                 <br> 2 SMS Groups
                             </div>
                         </div>
@@ -64,7 +68,7 @@
                                 <button type="submit" class="btn btn-warning btn-sm" ng-click="upgrade_plan('3')" >$20 month</button>
                             </div>
                                 <br> $20/month 
-                                <br> 1000 texts
+                                <br> 1000 text credits
                                 <br> 2 SMS Groups
                             </div>
                         </div>

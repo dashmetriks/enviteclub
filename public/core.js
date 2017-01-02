@@ -11,10 +11,10 @@ var interceptor = function($q, $location) {
         responseError: function(rejection) {
             console.log('Failed with', rejection.status, 'status');
             if (rejection.status == 403) {
-                $location.url('/start');
+                $location.url('/');
             }
             if (rejection.status == 404) {
-                $location.url('/start');
+                $location.url('/');
             }
             return $q.reject(rejection);
         }
@@ -34,7 +34,7 @@ angular.module('envite', [
 
 .config(['$locationProvider', '$routeProvider',
     function($locationProvider, $routeProvider) {
-        $routeProvider.otherwise({redirectTo: '/start'});
+        $routeProvider.otherwise({redirectTo: '/'});
         $locationProvider.html5Mode(true);
     }
 ])

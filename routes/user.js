@@ -44,22 +44,24 @@ exports.register = function(req, res) {
                 password: bcrypt.hashSync(req.body.password, salt)
             });
             newuser.save(function(err, new_user) {
-                if (err)
-                    throw err;
+                if (err) throw err;
                 
                     client.sendMessage({
-
-                        to: '+1' + req.body.phone, // Any number Twilio can deliver to
-                        from: '+14152149049', // A number you bought from Twilio and can use for outbound communication
-                        //body: req.body.sms_type // body of the SMS message
+                        to: '+1' + req.body.phone, 
+                        from: '+14152149049', 
                         body: "Please enter code " + new_user.confirm_phone_code + " to confirm this number"
 
-                    }, function(err, responseData) { //this function is executed when a response is received from Twilio
+                    }, function(err, responseData) { 
+                        if (!err) { }
+                    });
 
-                        console.log(err)
-                        if (!err) { // "err" is an error received during the request, if any
+                    client.sendMessage({
+                        to: '+14157865548', 
+                        from: '+14152149049', 
+                        body: "New user signed up-" + req.body.name 
 
-                        }
+                    }, function(err, responseData) { 
+                        if (!err) { }
                     });
 
                 res.json({

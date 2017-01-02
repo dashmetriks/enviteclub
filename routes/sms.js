@@ -143,6 +143,7 @@ exports.sendsms = function(req, res, callback) {
                                 Messages.create({
                                         event_id: req.params.event_id,
                                         user_phone: doc.invited_phone,
+                                        message_type: "sms",
                                         twilio_number: doc.twilio_number,
                                         owner_phone: user.phone
                                     },
@@ -239,9 +240,16 @@ exports.planstatus = function(req, res) {
                 if (plans.length) {
 
                     Messages.count({
-                            user_phone: user.phone
+                            user_phone: user.phone,
+                            message_type: "mms"
                         },
-                        function(err, messages) {
+                        function(err, messages_mms) {
+                            if (err) throw err;
+                    Messages.count({
+                            user_phone: user.phone,
+                            message_type: "sms"
+                        },
+                        function(err, messages_sms) {
                             if (err) throw err;
                             Event.count({
                                     event_creator: req.decoded._doc._id
@@ -252,9 +260,11 @@ exports.planstatus = function(req, res) {
                                         'plans': plans,
                                         'date_now': Date.now(),
                                         'event_count': event_count,
-                                        'message_count': messages
+                                        'message_mms': messages_mms,
+                                        'message_sms': messages_sms
                                     });
                                 });
+                           });
                         });
                 } else {
                     res.json({
@@ -307,7 +317,18 @@ exports.smsdata = function(req, res) {
                             if (sms_sender) {
                                 console.log(req.query.Body)
                             }
-                            Comments.create({
+                            if (req.query.MediaUrl0){
+                             Comments.create({
+                                    event_id: sms_sender.event_id,
+                                    displayname: sms_sender.invited,
+                                    mms_image: req.query.MediaUrl0, 
+                                    text: req.query.Body
+                                },
+                                function(err, result) {
+                                    if (err) throw err;
+                                });
+                            }else{
+                             Comments.create({
                                     event_id: sms_sender.event_id,
                                     displayname: sms_sender.invited,
                                     text: req.query.Body
@@ -315,6 +336,7 @@ exports.smsdata = function(req, res) {
                                 function(err, result) {
                                     if (err) throw err;
                                 });
+                             }
                             if (req.query.Body.toLowerCase() == "getout") {
                                 console.log("getttttttt   out")
                                 console.log(FromNumber)
@@ -345,6 +367,7 @@ exports.smsdata = function(req, res) {
                                             event_id: sms_sender.event_id,
                                             //user_phone: doc.invited_phone, 
                                             user_phone: events[0].event_creator_phone,
+                                            message_type: "sms",
                                             // twilio_number: doc.twilio_number, 
                                             twilio_number: req.query.To,
                                             owner_phone: events[0].event_creator_phone
@@ -362,39 +385,63 @@ exports.smsdata = function(req, res) {
                                     invites.forEach(function(doc) {
                                         if (doc.invited_phone) {
                                             console.log(doc.invited_phone)
+                                         if (req.query.MediaUrl0){
                                             client.sendMessage({
                                                 to: '+1' + doc.invited_phone,
                                                 from: req.query.To,
-                                                body: sms_sender.invited + ' says: ' + req.query.Body
-
+                                                body: sms_sender.invited + ' says: ' + req.query.Body,
+                                                mediaUrl: req.query.MediaUrl0
                                             }, function(err, responseData) {
                                                 Messages.create({
                                                         event_id: sms_sender.event_id,
                                                         user_phone: doc.invited_phone,
+                                                        message_type: "mms",
                                                         twilio_number: doc.twilio_number,
                                                         owner_phone: sms_sender.event_creator_phone
                                                     },
                                                     function(err, result) {
-                                                        if (err)
-                                                            throw err;
+                                                        if (err) throw err;
                                                     });
                                                 res.end('Done')
                                                 if (!err) {}
                                             });
+                                          }else{ //req.query.MediaUrl0
+                                            client.sendMessage({
+                                                to: '+1' + doc.invited_phone,
+                                                from: req.query.To,
+                                                body: sms_sender.invited + ' says: ' + req.query.Body,
+                                            }, function(err, responseData) {
+                                                Messages.create({
+                                                        event_id: sms_sender.event_id,
+                                                        user_phone: doc.invited_phone,
+                                                        message_type: "sms",
+                                                        twilio_number: doc.twilio_number,
+                                                        owner_phone: sms_sender.event_creator_phone
+                                                    },
+                                                    function(err, result) {
+                                                        if (err) throw err;
+                                                    });
+                                                res.end('Done')
+                                                if (!err) {}
+                                            });
+                                          } //req.query.MediaUrl0
                                         }
                                     });
-                                } else {
+                                } else { // reply_all
+                                 if (req.query.MediaUrl0){
                                     client.sendMessage({
                                         //  to: '+1' + doc.invited_phone,
                                         to: '+1' + events[0].event_creator_phone,
                                         from: req.query.To,
-                                        body: sms_sender.invited + ' says: ' + req.query.Body
+                                        body: sms_sender.invited + ' says: ' + req.query.Body,
+                                        mediaUrl: req.query.MediaUrl0
 
                                     }, function(err, responseData) {
                                         Messages.create({
                                                 event_id: sms_sender.event_id,
                                                 //user_phone: doc.invited_phone, 
                                                 user_phone: events[0].event_creator_phone,
+                                                message_type: "mms",
                                                 // twilio_number: doc.twilio_number, 
                                                 twilio_number: req.query.To,
                                                 owner_phone: events[0].event_creator_phone
@@ -406,6 +453,30 @@ exports.smsdata = function(req, res) {
                                         res.end('Done')
                                         if (!err) {}
                                     });
+                                  } else {
+                                    client.sendMessage({
+                                        //  to: '+1' + doc.invited_phone,
+                                        to: '+1' + events[0].event_creator_phone,
+                                        from: req.query.To,
+                                        body: sms_sender.invited + ' says: ' + req.query.Body
+                                    }, function(err, responseData) {
+                                        Messages.create({
+                                                event_id: sms_sender.event_id,
+                                                //user_phone: doc.invited_phone, 
+                                                user_phone: events[0].event_creator_phone,
+                                                message_type: "sms",
+                                                // twilio_number: doc.twilio_number, 
+                                                twilio_number: req.query.To,
+                                                owner_phone: events[0].event_creator_phone
+                                            },
+                                            function(err, result) {
+                                                if (err)
+                                                    throw err;
+                                            });
+                                        res.end('Done')
+                                        if (!err) {}
+                                    });
+                                 }
 
 
                                 }
